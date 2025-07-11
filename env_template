@@ -1,0 +1,4 @@
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB_NAME=customersdb
+API_KEY=1234567890
+JWT_SECRET=secret
