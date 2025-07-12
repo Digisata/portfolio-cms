@@ -100,15 +100,15 @@ const EditCustomer = ({ customer, setIsEditing, reloadCustomer }) => {
         onChange={(e) => setProfilePicture(e.target.value)}
       />
 
-      <div style={{ marginTop: "20px" }}>
-        <button type="submit">Save</button>
-        <button
+      <div style={{ marginTop: "30px" }}>
+        <input type="submit" value="Update" />
+        <input
           type="button"
-          onClick={() => setIsEditing(false)}
+          className="muted-button"
+          value="Cancel"
           style={{ marginLeft: "12px" }}
-        >
-          Cancel
-        </button>
+          onClick={() => setIsEditing(false)}
+        />
       </div>
     </form>
   );

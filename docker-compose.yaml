@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  portfolio-cms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: portfolio-cms
+    ports:
+      - "8000:8080" # Backend
+    depends_on:
+      - mongodb
+    env_file: .env
+    environment:
+      MONGO_URI: mongodb://$MONGO_DB_USER:$MONGO_DB_PASS@mongodb:$MONGO_DB_PORT
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - portfolio_network
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASS}
+    ports:
+      - "${MONGO_DB_PORT}:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - portfolio_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  portfolio_network:
+    driver: bridge

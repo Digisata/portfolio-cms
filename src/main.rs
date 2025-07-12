@@ -2,6 +2,7 @@
 extern crate rocket;
 
 use dotenv::dotenv;
+use rocket::fs::FileServer;
 use rocket_okapi::{
     openapi_get_routes,
     swagger_ui::{make_swagger_ui, SwaggerUIConfig},
@@ -17,9 +18,12 @@ mod routes;
 #[launch]
 fn rocket() -> _ {
     dotenv().ok();
+
     rocket::build()
         .attach(db::init())
         .attach(fairings::cors::Cors)
+        // Serve React frontend from /var/www/html (as copied in Dockerfile)
+        .mount("/dashboard", FileServer::from("public"))
         .mount(
             "/",
             openapi_get_routes![

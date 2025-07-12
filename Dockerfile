@@ -1,24 +1,38 @@
-# Stage 1: Build
-FROM rust:1 as builder
+# Stage 1: Build React frontend
+FROM node:20 AS fe-builder
 
-# Install musl target support
+WORKDIR /app/fe
+
+COPY fe/package*.json ./
+RUN npm install
+
+COPY fe/ ./
+RUN npm run build
+
+# Stage 2: Build Rust backend
+FROM rust:1 AS be-builder
+
 RUN apt-get update && \
     apt-get install -y musl-tools pkg-config libssl-dev && \
     rustup target add x86_64-unknown-linux-musl
 
 WORKDIR /app
+
 COPY . .
 
 RUN cargo build --release --target x86_64-unknown-linux-musl
 
-# Stage 2: Minimal runtime
+# Stage 3: Runtime
 FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates
 
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/rust-rocket-sample /usr/local/bin/rust-rocket-sample
-COPY --from=builder /app/.env .env
-COPY --from=builder /app/Rocket.toml Rocket.toml
+# Copy Rocket backend binary and config
+COPY --from=be-builder /app/target/x86_64-unknown-linux-musl/release/rust-rocket-sample /usr/local/bin/rust-rocket-sample
+COPY --from=be-builder /app/Rocket.toml Rocket.toml
+
+# Copy React build output to folder Rocket will serve (e.g., "public")
+COPY --from=fe-builder /app/fe/build /public
 
 EXPOSE 8080
 

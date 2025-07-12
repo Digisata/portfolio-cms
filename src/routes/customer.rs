@@ -21,6 +21,7 @@ use crate::{
 pub async fn get_customers(
     db: &State<Database>,
     limit: Option<i64>,
+    _key: ApiKey,
     page: Option<i64>,
 ) -> Result<Json<Vec<Customer>>, MyError> {
     // Error handling
@@ -48,7 +49,11 @@ pub async fn get_customers(
 /// get customer document by _id
 #[openapi(tag = "Customer")]
 #[get("/customer/<id>")]
-pub async fn get_customer_by_id(db: &State<Database>, id: &str) -> Result<Json<Customer>, MyError> {
+pub async fn get_customer_by_id(
+    db: &State<Database>,
+    _key: ApiKey,
+    id: &str,
+) -> Result<Json<Customer>, MyError> {
     let Ok(oid) = ObjectId::parse_str(id) else {
         return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
     };
@@ -73,6 +78,7 @@ pub async fn get_customer_by_id(db: &State<Database>, id: &str) -> Result<Json<C
 #[post("/customer", data = "<input>")]
 pub async fn post_customer(
     db: &State<Database>,
+    _key: ApiKey,
     input: Json<CustomerInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
     // can set with a single error like this.

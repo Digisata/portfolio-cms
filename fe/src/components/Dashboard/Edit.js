@@ -140,8 +140,16 @@ const EditExperience = ({
       />
 
       <div>
-        <button type="submit">Update</button>
-        <button onClick={() => setIsEditing(false)}>Cancel</button>
+        <div style={{ marginTop: "30px" }}>
+          <input type="submit" value="Update" />
+          <input
+            type="button"
+            className="muted-button"
+            value="Cancel"
+            style={{ marginLeft: "12px" }}
+            onClick={() => setIsEditing(false)}
+          />
+        </div>
       </div>
     </form>
   );
@@ -244,10 +252,16 @@ const EditProject = ({
       />
 
       <div>
-        <button type="submit">Update</button>
-        <button type="button" onClick={() => setIsEditingProject(false)}>
-          Cancel
-        </button>
+        <div style={{ marginTop: "30px" }}>
+          <input type="submit" value="Update" />
+          <input
+            type="button"
+            className="muted-button"
+            value="Cancel"
+            style={{ marginLeft: "12px" }}
+            onClick={() => setIsEditingProject(false)}
+          />
+        </div>
       </div>
     </form>
   );
@@ -318,10 +332,16 @@ const EditSkill = ({ selectedSkill, reloadSkills, setIsEditingSkill }) => {
       />
 
       <div>
-        <button type="submit">Update</button>
-        <button type="button" onClick={() => setIsEditingSkill(false)}>
-          Cancel
-        </button>
+        <div style={{ marginTop: "30px" }}>
+          <input type="submit" value="Update" />
+          <input
+            type="button"
+            className="muted-button"
+            value="Cancel"
+            style={{ marginLeft: "12px" }}
+            onClick={() => setIsEditingSkill(false)}
+          />
+        </div>
       </div>
     </form>
   );
@@ -396,10 +416,16 @@ const EditSocial = ({ selectedSocial, reloadSocials, setIsEditingSocial }) => {
       />
 
       <div>
-        <button type="submit">Update</button>
-        <button type="button" onClick={() => setIsEditingSocial(false)}>
-          Cancel
-        </button>
+        <div style={{ marginTop: "30px" }}>
+          <input type="submit" value="Update" />
+          <input
+            type="button"
+            className="muted-button"
+            value="Cancel"
+            style={{ marginLeft: "12px" }}
+            onClick={() => setIsEditingSocial(false)}
+          />
+        </div>
       </div>
     </form>
   );
