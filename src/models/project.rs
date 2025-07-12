@@ -11,6 +11,7 @@ pub struct ProjectDocument {
     pub name: String,
     pub description: String,
     pub link: String,
+    pub photo_link: String,
     pub order: i32,
     pub stack: Vec<String>,
     /// createdAt
@@ -29,6 +30,7 @@ pub struct Project {
     pub name: String,
     pub description: String,
     pub link: String,
+    pub photo_link: String,
     pub order: i32,
     pub stack: Vec<String>,
     /// createdAt
@@ -40,6 +42,7 @@ pub struct ProjectInput {
     pub name: String,
     pub description: String,
     pub link: String,
+    pub photo_link: String,
     pub order: i32,
     pub stack: Vec<String>,
 }
@@ -51,6 +54,7 @@ pub struct ProjectsInput {
     pub name: String,
     pub description: String,
     pub link: String,
+    pub photo_link: String,
     pub order: i32,
     pub stack: Vec<String>,
 }

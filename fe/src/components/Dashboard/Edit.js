@@ -1,9 +1,27 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { updateExperienceById } from "../../utils/api";
+import {
+  updateExperienceById,
+  updateProjectById,
+  updateSkillById,
+  updateSocialById,
+} from "../../utils/api";
 
-const Edit = ({ selectedExperience, reloadExperiences, setIsEditing }) => {
-  const [formData, setFormData] = useState({ ...selectedExperience });
+const EditExperience = ({
+  selectedExperience,
+  reloadExperiences,
+  setIsEditing,
+}) => {
+  const formatToLocalInput = (utcString) => {
+    const date = new Date(utcString);
+    return date.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+  };
+
+  const [formData, setFormData] = useState({
+    ...selectedExperience,
+    start_date: formatToLocalInput(selectedExperience.start_date),
+    end_date: formatToLocalInput(selectedExperience.end_date),
+  });
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -31,7 +49,7 @@ const Edit = ({ selectedExperience, reloadExperiences, setIsEditing }) => {
     };
 
     try {
-      await updateExperienceById(formData.id, payload, token);
+      await updateExperienceById(formData._id || formData.id, payload, token);
       await reloadExperiences();
       Swal.fire({
         icon: "success",
@@ -129,4 +147,262 @@ const Edit = ({ selectedExperience, reloadExperiences, setIsEditing }) => {
   );
 };
 
-export default Edit;
+const EditProject = ({
+  selectedProject,
+  reloadProjects,
+  setIsEditingProject,
+}) => {
+  const [formData, setFormData] = useState({ ...selectedProject });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleStackChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      stack: value.split(",").map((s) => s.trim()),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    const payload = {
+      name: formData.name,
+      description: formData.description,
+      link: formData.link,
+      photo_link: formData.photo_link,
+      order: Number(formData.order),
+      stack: formData.stack,
+    };
+
+    try {
+      await updateProjectById(formData._id, payload, token);
+      await reloadProjects();
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Project has been updated.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      setIsEditingProject(false);
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to update",
+        text: err.message,
+      });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="edit-form">
+      <h2>Edit Project</h2>
+
+      <label>Name</label>
+      <input name="name" value={formData.name} onChange={handleInputChange} />
+
+      <label>Description</label>
+      <textarea
+        name="description"
+        value={formData.description}
+        onChange={handleInputChange}
+      />
+
+      <label>Link</label>
+      <input name="link" value={formData.link} onChange={handleInputChange} />
+
+      <label>Photo Link</label>
+      <input
+        name="photo_link"
+        value={formData.photo_link}
+        onChange={handleInputChange}
+      />
+
+      <label>Order</label>
+      <input
+        type="number"
+        name="order"
+        value={formData.order}
+        onChange={handleInputChange}
+      />
+
+      <label>Stack (comma-separated)</label>
+      <input
+        name="stack"
+        value={formData.stack.join(", ")}
+        onChange={handleStackChange}
+      />
+
+      <div>
+        <button type="submit">Update</button>
+        <button type="button" onClick={() => setIsEditingProject(false)}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+};
+
+const EditSkill = ({ selectedSkill, reloadSkills, setIsEditingSkill }) => {
+  const [formData, setFormData] = useState({ ...selectedSkill });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleStackChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      stack: value.split(",").map((s) => s.trim()),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    const payload = {
+      name: formData.name,
+      order: Number(formData.order),
+    };
+
+    try {
+      await updateSkillById(formData._id, payload, token);
+      await reloadSkills();
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Skill has been updated.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      setIsEditingSkill(false);
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to update",
+        text: err.message,
+      });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="edit-form">
+      <h2>Edit Skill</h2>
+
+      <label>Name</label>
+      <input name="name" value={formData.name} onChange={handleInputChange} />
+
+      <label>Order</label>
+      <input
+        type="number"
+        name="order"
+        value={formData.order}
+        onChange={handleInputChange}
+      />
+
+      <div>
+        <button type="submit">Update</button>
+        <button type="button" onClick={() => setIsEditingSkill(false)}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+};
+
+const EditSocial = ({ selectedSocial, reloadSocials, setIsEditingSocial }) => {
+  const [formData, setFormData] = useState({ ...selectedSocial });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleStackChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      stack: value.split(",").map((s) => s.trim()),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    const payload = {
+      name: formData.name,
+      link: formData.link,
+      order: Number(formData.order),
+    };
+
+    try {
+      await updateSocialById(formData._id, payload, token);
+      await reloadSocials();
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Social has been updated.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      setIsEditingSocial(false);
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to update",
+        text: err.message,
+      });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="edit-form">
+      <h2>Edit Social</h2>
+
+      <label>Name</label>
+      <input name="name" value={formData.name} onChange={handleInputChange} />
+
+      <label>Link</label>
+      <input name="link" value={formData.link} onChange={handleInputChange} />
+
+      <label>Order</label>
+      <input
+        type="number"
+        name="order"
+        value={formData.order}
+        onChange={handleInputChange}
+      />
+
+      <div>
+        <button type="submit">Update</button>
+        <button type="button" onClick={() => setIsEditingSocial(false)}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export { EditExperience, EditProject, EditSkill, EditSocial };

@@ -25,18 +25,18 @@ pub async fn find_customer(
 
     let mut customers: Vec<Customer> = vec![];
     while let Some(result) = cursor.try_next().await? {
-        let _id = result.id;
-        let name = result.name;
-        let email = result.email;
-        let password = result.password;
-        let created_at = result.created_at;
         // transform ObjectId to String
         let customer_json = Customer {
-            id: _id.to_string(),
-            name: name.to_string(),
-            email: email.to_string(),
-            password: password.to_string(),
-            created_at: created_at.to_string(),
+            id: result.id.to_string(),
+            name: result.name.to_string(),
+            email: result.email.to_string(),
+            phone: result.phone.to_string(),
+            wa_link: result.wa_link.to_string(),
+            intro: result.intro.to_string(),
+            about: result.about.to_string(),
+            profile_picture: result.profile_picture.to_string(),
+            password: result.password.to_string(),
+            created_at: result.created_at.to_string(),
         };
         customers.push(customer_json);
     }
@@ -59,6 +59,11 @@ pub async fn find_customer_by_id(
         id: customer_doc.id.to_string(),
         name: customer_doc.name.to_string(),
         email: customer_doc.email.to_string(),
+        phone: customer_doc.phone.to_string(),
+        wa_link: customer_doc.wa_link.to_string(),
+        intro: customer_doc.intro.to_string(),
+        about: customer_doc.about.to_string(),
+        profile_picture: customer_doc.profile_picture.to_string(),
         password: customer_doc.password.to_string(),
         created_at: customer_doc.created_at.to_string(),
     };
@@ -81,6 +86,11 @@ pub async fn find_customer_by_email(
         id: customer_doc.id.to_string(),
         name: customer_doc.name.to_string(),
         email: customer_doc.email.to_string(),
+        phone: customer_doc.phone.to_string(),
+        wa_link: customer_doc.wa_link.to_string(),
+        intro: customer_doc.intro.to_string(),
+        about: customer_doc.about.to_string(),
+        profile_picture: customer_doc.profile_picture.to_string(),
         password: customer_doc.password.to_string(),
         created_at: customer_doc.created_at.to_string(),
     };
@@ -104,7 +114,17 @@ pub async fn insert_customer(
 
     let insert_one_result = collection
         .insert_one(
-            doc! {"name": input.name.clone(), "email": input.email.clone(), "password": hashed_password,"createdAt": created_at},
+            doc! {
+                "name": input.name.clone(),
+                "email": input.email.clone(),
+                "phone": input.phone.clone(),
+                "wa_link": input.wa_link.clone(),
+                "intro": input.intro.clone(),
+                "about": input.about.clone(),
+                "profile_picture": input.profile_picture.clone(),
+                "password": hashed_password,
+                "createdAt": created_at,
+            },
             None,
         )
         .await?;
@@ -131,6 +151,11 @@ pub async fn update_customer_by_id(
                     "$set": {
                         "name": input.name.clone(),
                         "email": input.email.clone(),
+                        "phone": input.phone.clone(),
+                        "wa_link": input.wa_link.clone(),
+                        "intro": input.intro.clone(),
+                        "about": input.about.clone(),
+                        "profile_picture": input.profile_picture.clone(),
                         "createdAt": created_at,
                     }
             },
@@ -146,6 +171,11 @@ pub async fn update_customer_by_id(
         id: customer_doc.id.to_string(),
         name: customer_doc.name.to_string(),
         email: customer_doc.email.to_string(),
+        phone: customer_doc.phone.to_string(),
+        wa_link: customer_doc.wa_link.to_string(),
+        intro: customer_doc.intro.to_string(),
+        about: customer_doc.about.to_string(),
+        profile_picture: customer_doc.profile_picture.to_string(),
         password: customer_doc.password.to_string(),
         created_at: customer_doc.created_at.to_string(),
     };
@@ -172,6 +202,11 @@ pub async fn delete_customer_by_id(
         id: customer_doc.id.to_string(),
         name: customer_doc.name.to_string(),
         email: customer_doc.email.to_string(),
+        phone: customer_doc.phone.to_string(),
+        wa_link: customer_doc.wa_link.to_string(),
+        intro: customer_doc.intro.to_string(),
+        about: customer_doc.about.to_string(),
+        profile_picture: customer_doc.profile_picture.to_string(),
         password: customer_doc.password.to_string(),
         created_at: customer_doc.created_at.to_string(),
     };

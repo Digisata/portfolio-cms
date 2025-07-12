@@ -73,7 +73,6 @@ pub async fn get_customer_by_id(db: &State<Database>, id: &str) -> Result<Json<C
 #[post("/customer", data = "<input>")]
 pub async fn post_customer(
     db: &State<Database>,
-    _key: ApiKey,
     input: Json<CustomerInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
     // can set with a single error like this.
