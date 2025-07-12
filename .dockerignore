@@ -11,3 +11,11 @@ docker-compose.yml
 
 # github
 .github/
+
+# dependencies
+/fe/.DS_*
+/fe/*.log
+/fe/logs
+/fe/**/*.backup.*
+/fe/**/*.back.*
+/fe/node_modules

@@ -18,3 +18,8 @@ pub fn index() -> Json<MessageResponse> {
         message: "Hello World!".to_string(),
     })
 }
+
+#[options("/<_..>")]
+pub fn all_options_handler() -> &'static str {
+    ""
+}

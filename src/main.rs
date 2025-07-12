@@ -56,6 +56,7 @@ fn rocket() -> _ {
                 routes::social::delete_by_id,
             ],
         )
+        .mount("/", routes![routes::all_options_handler])
         .mount(
             "/api-docs",
             make_swagger_ui(&SwaggerUIConfig {
