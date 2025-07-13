@@ -36,7 +36,7 @@ pub async fn get(
     // }
 
     // Setting default values
-    let limit: i64 = limit.unwrap_or(12);
+    let limit: i64 = limit.unwrap_or(100);
     let page: i64 = page.unwrap_or(1);
     match project::find(db, limit, page).await {
         Ok(resp) => Ok(Json(resp)),

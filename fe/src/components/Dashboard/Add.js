@@ -26,10 +26,10 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
       !workType ||
       !location ||
       !startDate ||
-      !endDate ||
       !position ||
       !description ||
-      !order
+      !order ||
+      (!isPresent && !endDate)
     ) {
       return Swal.fire({
         icon: "error",
@@ -41,17 +41,24 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
 
     const token = localStorage.getItem("token");
 
-    const payload = {
+    let payload = {
       company,
       work_type: workType,
       location,
       start_date: new Date(startDate).toISOString(),
-      end_date: new Date(endDate).toISOString(),
       is_present: isPresent,
       position,
       description,
       order: Number(order),
     };
+
+    if (endDate) {
+      payload.end_date = new Date(endDate).toISOString();
+    }
+
+    if (isPresent) {
+      payload.end_date = new Date().toISOString();
+    }
 
     try {
       const newExperience = await addExperience(payload, token);

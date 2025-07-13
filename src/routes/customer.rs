@@ -38,7 +38,7 @@ pub async fn get_customers(
     // }
 
     // Setting default values
-    let limit: i64 = limit.unwrap_or(12);
+    let limit: i64 = limit.unwrap_or(100);
     let page: i64 = page.unwrap_or(1);
     match customer::find_customer(db, limit, page).await {
         Ok(customer_docs) => Ok(Json(customer_docs)),
@@ -69,6 +69,27 @@ pub async fn get_customer_by_id(
         Err(_error) => Err(MyError::build(
             400,
             Some(format!("Customer not found with _id {}", &id)),
+        )),
+    }
+}
+
+#[openapi(tag = "Customer")]
+#[get("/customer/email/<email>")]
+pub async fn get_customer_by_email(
+    db: &State<Database>,
+    email: &str,
+) -> Result<Json<Customer>, MyError> {
+    match customer::find_customer_by_email(db, email.to_string()).await {
+        Ok(customer_doc) => match customer_doc {
+            None => Err(MyError::build(
+                400,
+                Some(format!("Customer not found with email {}", email)),
+            )),
+            Some(customer_doc) => Ok(Json(customer_doc)),
+        },
+        Err(_error) => Err(MyError::build(
+            400,
+            Some(format!("Customer not found with email {}", email)),
         )),
     }
 }

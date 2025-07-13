@@ -23,7 +23,7 @@ pub async fn find(db: &Database, limit: i64, page: i64) -> mongodb::error::Resul
 
     let mut resp: Vec<Experience> = vec![];
     while let Some(result) = cursor.try_next().await? {
-        let json_resp = Experience {
+        let mut json_resp = Experience {
             id: result.id.to_string(),
             company: result.company,
             work_type: result.work_type,
@@ -36,6 +36,11 @@ pub async fn find(db: &Database, limit: i64, page: i64) -> mongodb::error::Resul
             order: result.order,
             created_at: result.created_at.to_string(),
         };
+
+        if json_resp.is_present {
+            json_resp.end_date = mongodb::bson::DateTime::from_chrono(Utc::now()).to_string();
+        }
+
         resp.push(json_resp);
     }
 
@@ -53,7 +58,7 @@ pub async fn find_by_id(
     };
 
     // transform ObjectId to String
-    let resp = Experience {
+    let mut resp = Experience {
         id: result.id.to_string(),
         company: result.company,
         work_type: result.work_type,
@@ -66,6 +71,10 @@ pub async fn find_by_id(
         order: result.order,
         created_at: result.created_at.to_string(),
     };
+
+    if resp.is_present {
+        resp.end_date = mongodb::bson::DateTime::from_chrono(Utc::now()).to_string();
+    }
 
     Ok(Some(resp))
 }

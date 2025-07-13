@@ -31,6 +31,7 @@ fn rocket() -> _ {
                 routes::auth::login,
                 routes::customer::get_customers,
                 routes::customer::get_customer_by_id,
+                routes::customer::get_customer_by_email,
                 routes::customer::post_customer,
                 routes::customer::patch_customer_by_id,
                 routes::customer::delete_customer_by_id,
