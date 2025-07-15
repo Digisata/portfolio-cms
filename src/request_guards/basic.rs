@@ -1,3 +1,4 @@
+use jsonwebtoken::{decode, DecodingKey, Validation};
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket_okapi::okapi;
@@ -8,9 +9,8 @@ use rocket_okapi::{
     gen::OpenApiGenerator,
     request::{OpenApiFromRequest, RequestHeaderInput},
 };
-use std::env;
-use jsonwebtoken::{decode, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
+use std::env;
 
 use crate::errors::response::unauthorized_response;
 
@@ -36,9 +36,13 @@ impl<'r> FromRequest<'r> for ApiKey {
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         fn verify_jwt(token: &str) -> Option<Claims> {
             let secret = env::var("JWT_SECRET").expect("env.JWT_SECRET is not found.");
-            decode::<Claims>(token, &DecodingKey::from_secret(secret.as_ref()), &Validation::default())
-                .map(|data| data.claims)
-                .ok()
+            decode::<Claims>(
+                token,
+                &DecodingKey::from_secret(secret.as_ref()),
+                &Validation::default(),
+            )
+            .map(|data| data.claims)
+            .ok()
         }
 
         match req.headers().get_one("Authorization") {

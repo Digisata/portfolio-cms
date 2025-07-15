@@ -16,6 +16,7 @@ const ExperienceTable = ({ experiences, handleEdit, handleDelete, error }) => {
             <th>Start Date</th>
             <th>End Date</th>
             <th>Is Present</th>
+            <th>Order</th>
             <th colSpan={2} className="text-center">
               Actions
             </th>
@@ -33,6 +34,7 @@ const ExperienceTable = ({ experiences, handleEdit, handleDelete, error }) => {
                 <td>{exp.start_date}</td>
                 <td>{exp.end_date}</td>
                 <td>{exp.is_present ? "✅" : "❌"}</td>
+                <td>{exp.order}</td>
                 <td className="text-right">
                   <button
                     onClick={() => handleEdit(exp._id)}

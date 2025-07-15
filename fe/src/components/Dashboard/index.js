@@ -36,8 +36,8 @@ import CustomerProfile from "./CustomerProfile"; // ✅ new import
 const Dashboard = ({ setIsAuthenticated }) => {
   const [experiences, setExperiences] = useState([]);
   const [selectedExperience, setSelectedExperience] = useState(null);
-  const [isAdding, setIsAdding] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isAddingExperience, setIsAddingExperience] = useState(false);
+  const [isEditingExperience, setIsEditingExperience] = useState(false);
 
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -99,12 +99,12 @@ const Dashboard = ({ setIsAuthenticated }) => {
     loadSocials();
   }, []);
 
-  const handleEdit = async (id) => {
+  const handleEditExperience = async (id) => {
     try {
       const token = localStorage.getItem("token");
       const data = await getExperienceDetail(id, token);
       setSelectedExperience({ ...data, id });
-      setIsEditing(true);
+      setIsEditingExperience(true);
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -114,7 +114,7 @@ const Dashboard = ({ setIsAuthenticated }) => {
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDeleteExperience = (id) => {
     Swal.fire({
       icon: "warning",
       title: "Are you sure?",
@@ -307,32 +307,32 @@ const Dashboard = ({ setIsAuthenticated }) => {
       <CustomerProfile />
 
       {/* EXPERIENCE */}
-      {!isAdding && !isEditing && (
+      {!isAddingExperience && !isEditingExperience && (
         <>
           <HeaderExperience
-            setIsAdding={setIsAdding}
+            setIsAdding={setIsAddingExperience}
             setIsAuthenticated={setIsAuthenticated}
           />
           <ExperienceTable
             experiences={experiences}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
+            handleEdit={handleEditExperience}
+            handleDelete={handleDeleteExperience}
             error={error}
           />
         </>
       )}
-      {isAdding && (
+      {isAddingExperience && (
         <AddExperience
-          setIsAdding={setIsAdding}
+          setIsAdding={setIsAddingExperience}
           reloadExperiences={loadExperiences}
         />
       )}
-      {isEditing && (
+      {isEditingExperience && (
         <EditExperience
           experiences={experiences}
           selectedExperience={selectedExperience}
           setExperiences={setExperiences}
-          setIsEditing={setIsEditing}
+          setIsEditing={setIsEditingExperience}
           reloadExperiences={loadExperiences}
         />
       )}

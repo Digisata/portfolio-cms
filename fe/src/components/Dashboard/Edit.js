@@ -21,7 +21,34 @@ const EditExperience = ({
     ...selectedExperience,
     start_date: formatToLocalInput(selectedExperience.start_date),
     end_date: formatToLocalInput(selectedExperience.end_date),
+    description: Array.isArray(selectedExperience.description)
+      ? selectedExperience.description
+      : [selectedExperience.description || ""],
   });
+
+  const handleDescriptionChange = (index, value) => {
+    setFormData((prev) => {
+      const updatedDescriptions = [...prev.description];
+      updatedDescriptions[index] = value;
+      return { ...prev, description: updatedDescriptions };
+    });
+  };
+
+  const addDescriptionField = () => {
+    setFormData((prev) => ({
+      ...prev,
+      description: [...prev.description, ""],
+    }));
+  };
+
+  const removeDescriptionField = (index) => {
+    setFormData((prev) => {
+      const updatedDescriptions = prev.description.filter(
+        (_, i) => i !== index,
+      );
+      return { ...prev, description: updatedDescriptions };
+    });
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -125,11 +152,49 @@ const EditExperience = ({
       />
 
       <label>Description</label>
-      <textarea
-        name="description"
-        value={formData.description}
-        onChange={handleInputChange}
-      />
+      {formData.description.map((desc, index) => (
+        <div
+          key={index}
+          style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}
+        >
+          <input
+            type="text"
+            value={desc}
+            onChange={(e) => handleDescriptionChange(index, e.target.value)}
+            style={{ flex: 1 }}
+          />
+          <button
+            type="button"
+            onClick={() => removeDescriptionField(index)}
+            style={{
+              marginLeft: "8px",
+              padding: "4px 8px",
+              background: "#ff4d4f",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            ❌
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addDescriptionField}
+        style={{
+          marginTop: "8px",
+          padding: "6px 12px",
+          background: "#1890ff",
+          color: "#fff",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
+      >
+        ➕ Add Description
+      </button>
 
       <label>Order</label>
       <input
@@ -160,21 +225,40 @@ const EditProject = ({
   reloadProjects,
   setIsEditingProject,
 }) => {
-  const [formData, setFormData] = useState({ ...selectedProject });
+  const [formData, setFormData] = useState({
+    ...selectedProject,
+    stack: Array.isArray(selectedProject.stack)
+      ? selectedProject.stack
+      : [selectedProject.stack || ""],
+  });
+
+  const handleStackChange = (index, value) => {
+    setFormData((prev) => {
+      const updatedStacks = [...prev.stack];
+      updatedStacks[index] = value;
+      return { ...prev, stack: updatedStacks };
+    });
+  };
+
+  const addStackField = () => {
+    setFormData((prev) => ({
+      ...prev,
+      stack: [...prev.stack, ""],
+    }));
+  };
+
+  const removeStackField = (index) => {
+    setFormData((prev) => {
+      const updatedStacks = prev.stack.filter((_, i) => i !== index);
+      return { ...prev, stack: updatedStacks };
+    });
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleStackChange = (e) => {
-    const value = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      stack: value.split(",").map((s) => s.trim()),
     }));
   };
 
@@ -244,12 +328,50 @@ const EditProject = ({
         onChange={handleInputChange}
       />
 
-      <label>Stack (comma-separated)</label>
-      <input
-        name="stack"
-        value={formData.stack.join(", ")}
-        onChange={handleStackChange}
-      />
+      <label>Stack</label>
+      {formData.stack.map((stack, index) => (
+        <div
+          key={index}
+          style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}
+        >
+          <input
+            type="text"
+            value={stack}
+            onChange={(e) => handleStackChange(index, e.target.value)}
+            style={{ flex: 1 }}
+          />
+          <button
+            type="button"
+            onClick={() => removeStackField(index)}
+            style={{
+              marginLeft: "8px",
+              padding: "4px 8px",
+              background: "#ff4d4f",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            ❌
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addStackField}
+        style={{
+          marginTop: "8px",
+          padding: "6px 12px",
+          background: "#1890ff",
+          color: "#fff",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
+      >
+        ➕ Add Stack
+      </button>
 
       <div>
         <div style={{ marginTop: "30px" }}>

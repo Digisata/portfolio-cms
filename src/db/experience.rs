@@ -1,7 +1,7 @@
 use crate::models::experience::{
     Experience, ExperienceDocument, ExperienceInput, ExperiencesInput,
 };
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use futures::stream::TryStreamExt;
 use mongodb::{
     bson::{doc, oid::ObjectId, Document},
@@ -38,7 +38,8 @@ pub async fn find(db: &Database, limit: i64, page: i64) -> mongodb::error::Resul
         };
 
         if json_resp.is_present {
-            json_resp.end_date = mongodb::bson::DateTime::from_chrono(Utc::now()).to_string();
+            let now: DateTime<Utc> = Utc::now();
+            json_resp.end_date = now.format("%Y-%m-%d %H:%M:%S UTC").to_string();
         }
 
         resp.push(json_resp);
@@ -73,7 +74,8 @@ pub async fn find_by_id(
     };
 
     if resp.is_present {
-        resp.end_date = mongodb::bson::DateTime::from_chrono(Utc::now()).to_string();
+        let now: DateTime<Utc> = Utc::now();
+        resp.end_date = now.format("%Y-%m-%d %H:%M:%S UTC").to_string();
     }
 
     Ok(Some(resp))

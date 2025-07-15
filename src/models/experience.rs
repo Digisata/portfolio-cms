@@ -17,7 +17,7 @@ pub struct ExperienceDocument {
     pub end_date: DateTime<Utc>,
     pub is_present: bool,
     pub position: String,
-    pub description: String,
+    pub description: Vec<String>,
     pub order: i32,
     /// createdAt
     #[serde(
@@ -39,7 +39,7 @@ pub struct Experience {
     pub end_date: String,
     pub is_present: bool,
     pub position: String,
-    pub description: String,
+    pub description: Vec<String>,
     pub order: i32,
     /// createdAt
     pub created_at: String,
@@ -54,7 +54,7 @@ pub struct ExperienceInput {
     pub end_date: String,
     pub is_present: bool,
     pub position: String,
-    pub description: String,
+    pub description: Vec<String>,
     pub order: i32,
 }
 
@@ -69,6 +69,6 @@ pub struct ExperiencesInput {
     pub end_date: String,
     pub is_present: bool,
     pub position: String,
-    pub description: String,
+    pub description: Vec<String>,
     pub order: i32,
 }
