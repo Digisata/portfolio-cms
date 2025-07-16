@@ -7,6 +7,11 @@ COPY fe/package*.json ./
 RUN npm install
 
 COPY fe/ ./
+
+# Set the base URL during build
+ARG REACT_APP_BASE_URL
+ENV REACT_APP_BASE_URL=$REACT_APP_BASE_URL
+
 RUN npm run build
 
 # Stage 2: Build Rust backend
