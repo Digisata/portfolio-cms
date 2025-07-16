@@ -33,7 +33,7 @@ const CustomerProfile = () => {
 
   return (
     <div className="customer-profile">
-      <h2>Customer Profile</h2>
+      <h2>Profile</h2>
       {!isEditing ? (
         <div>
           <p>
