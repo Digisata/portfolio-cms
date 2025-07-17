@@ -1,6 +1,6 @@
 // utils/api.js
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000";
+const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:8000";
 
 export async function apiRequest(
   endpoint,
