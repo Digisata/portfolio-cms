@@ -61,7 +61,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
     }
 
     try {
-      const newExperience = await addExperience(payload, token);
+      await addExperience(payload, token);
 
       Swal.fire({
         icon: "success",

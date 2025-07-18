@@ -20,7 +20,7 @@ const Logout = ({ setIsAuthenticated }) => {
           willClose: () => {
             // 🔴 Clear auth info
             localStorage.removeItem("token"); // ⬅️ remove the JWT
-            localStorage.setItem("is_authenticated", false);
+            localStorage.setItem("is_authenticated", "false");
             setIsAuthenticated(false);
           },
         });

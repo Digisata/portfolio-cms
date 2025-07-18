@@ -1,6 +1,9 @@
 // utils/api.js
 
+import { jwtDecode } from "jwt-decode";
+
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:8000";
+const HOMEPAGE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3000";
 
 export async function apiRequest(
   endpoint,
@@ -23,6 +26,14 @@ export async function apiRequest(
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
+  if (response.status === 401) {
+    // Unauthorized: clear auth state and redirect
+    localStorage.removeItem("token");
+    localStorage.setItem("is_authenticated", "false");
+    window.location.href = `${HOMEPAGE_URL}/dashboard`;
+    return; // Exit early
+  }
+
   if (!response.ok) {
     const error = await response.text();
     throw new Error(error || "API request failed");
@@ -30,6 +41,9 @@ export async function apiRequest(
 
   return await response.json();
 }
+
+export const login = (payload, token) =>
+  apiRequest("/login", "POST", payload, token);
 
 export const getCustomerDetail = (id, token = null) =>
   apiRequest(`/customer/${id}`, "GET", null, token);
@@ -46,9 +60,8 @@ export const updateExperienceById = (id, data, token) =>
 export const deleteExperienceById = (id, token) =>
   apiRequest(`/experience/${id}`, "DELETE", null, token);
 
-export async function addExperience(payload, token) {
-  return await apiRequest("/experience", "POST", payload, token);
-}
+export const addExperience = (payload, token) =>
+  apiRequest("/experience", "POST", payload, token);
 
 export const getProjectDetail = (id, token = null) =>
   apiRequest(`/project/${id}`, "GET", null, token);
@@ -59,9 +72,8 @@ export const updateProjectById = (id, data, token) =>
 export const deleteProjectById = (id, token) =>
   apiRequest(`/project/${id}`, "DELETE", null, token);
 
-export async function addProject(payload, token) {
-  return await apiRequest("/project", "POST", payload, token);
-}
+export const addProject = (payload, token) =>
+  apiRequest("/project", "POST", payload, token);
 
 export const getSkillDetail = (id, token = null) =>
   apiRequest(`/skill/${id}`, "GET", null, token);
@@ -72,9 +84,8 @@ export const updateSkillById = (id, data, token) =>
 export const deleteSkillById = (id, token) =>
   apiRequest(`/skill/${id}`, "DELETE", null, token);
 
-export async function addSkill(payload, token) {
-  return await apiRequest("/skill", "POST", payload, token);
-}
+export const addSkill = (payload, token) =>
+  apiRequest("/skill", "POST", payload, token);
 
 export const getSocialDetail = (id, token = null) =>
   apiRequest(`/social/${id}`, "GET", null, token);
@@ -85,6 +96,20 @@ export const updateSocialById = (id, data, token) =>
 export const deleteSocialById = (id, token) =>
   apiRequest(`/social/${id}`, "DELETE", null, token);
 
-export async function addSocial(payload, token) {
-  return await apiRequest("/social", "POST", payload, token);
-}
+export const addSocial = (payload, token) =>
+  apiRequest("/social", "POST", payload, token);
+
+export const getIdFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    const decoded = jwtDecode(token);
+    return {
+      id: decoded.sub,
+      token,
+    };
+  }
+
+  localStorage.removeItem("token");
+  localStorage.setItem("is_authenticated", "false");
+  window.location.href = `${HOMEPAGE_URL}/dashboard`;
+};

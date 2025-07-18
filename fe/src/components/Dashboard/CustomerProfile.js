@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { getCustomerDetail } from "../../utils/api";
+import { getCustomerDetail, getIdFromToken } from "../../utils/api";
 import EditCustomer from "./EditCustomer";
 
 const CustomerProfile = () => {
@@ -10,12 +10,10 @@ const CustomerProfile = () => {
 
   const loadCustomer = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const decoded = jwtDecode(token);
-      const customerId = decoded.sub;
+      const { id, token } = getIdFromToken();
 
-      const data = await getCustomerDetail(customerId, token);
-      setCustomer({ ...data, id: customerId });
+      const data = await getCustomerDetail(id, token);
+      setCustomer({ ...data, id: id });
     } catch (err) {
       Swal.fire({
         icon: "error",
