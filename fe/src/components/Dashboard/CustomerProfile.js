@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { getCustomerDetail, getIdFromToken } from "../../utils/api";
 import EditCustomer from "./EditCustomer";
+import Logout from "../Logout";
 
-const CustomerProfile = () => {
+const CustomerProfile = ({ setIsAuthenticated }) => {
   const [customer, setCustomer] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -59,7 +60,10 @@ const CustomerProfile = () => {
             <strong>Created At:</strong>{" "}
             {new Date(customer.createdAt).toLocaleString()}
           </p>
-          <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+          <div style={{ marginTop: "30px", marginBottom: "18px" }}>
+            <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+            <Logout setIsAuthenticated={setIsAuthenticated} />
+          </div>
         </div>
       ) : (
         <EditCustomer

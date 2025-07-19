@@ -1,14 +1,11 @@
 import React from "react";
 
-import Logout from "../Logout";
-
-const HeaderExperience = ({ setIsAdding, setIsAuthenticated }) => {
+const HeaderExperience = ({ setIsAdding }) => {
   return (
     <header>
       <h3>Experience</h3>
       <div style={{ marginTop: "30px", marginBottom: "18px" }}>
         <button onClick={() => setIsAdding(true)}>Add Experience</button>
-        <Logout setIsAuthenticated={setIsAuthenticated} />
       </div>
     </header>
   );

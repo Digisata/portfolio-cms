@@ -304,7 +304,7 @@ const Dashboard = ({ setIsAuthenticated }) => {
       <h1>Portfolio CMS</h1>
 
       <hr style={{ margin: "40px 0" }} />
-      <CustomerProfile />
+      <CustomerProfile setIsAuthenticated={setIsAuthenticated} />
 
       {/* EXPERIENCE */}
       {!isAddingExperience && !isEditingExperience && (
