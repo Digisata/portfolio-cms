@@ -1,4 +1,6 @@
 REACT_APP_BASE_URL=http://localhost:8000
+ENVIRONMENT=dev
+ALLOWED_URLS=https://back-office.my.id,https://www.khairunnaufal-hanif.fyi
 MONGO_URI=mongodb://localhost:27017
 JWT_SECRET=secret
 

@@ -1,12 +1,11 @@
-use mongodb::{
-    bson::{doc, oid::ObjectId},
-    Database,
-};
+use std::sync::Arc;
+
+use super::traits::SocialRepository;
+use mongodb::bson::{doc, oid::ObjectId};
 use rocket::{response::status::BadRequest, serde::json::Json, State};
 use rocket_okapi::openapi;
 
 use crate::{
-    db::social,
     errors::response::MyError,
     models::{
         response::MessageResponse,
@@ -18,7 +17,7 @@ use crate::{
 #[openapi(tag = "Social")]
 #[get("/social?<limit>&<page>")]
 pub async fn get(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     limit: Option<i64>,
     page: Option<i64>,
 ) -> Result<Json<Vec<Social>>, MyError> {
@@ -38,7 +37,12 @@ pub async fn get(
     // Setting default values
     let limit: i64 = limit.unwrap_or(100);
     let page: i64 = page.unwrap_or(1);
-    match social::find(db, limit, page).await {
+
+    let social_repo = container
+        .get::<Arc<dyn SocialRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match social_repo.find(limit, page).await {
         Ok(resp) => Ok(Json(resp)),
         Err(error) => Err(MyError::build(400, Some(error.to_string()))),
     }
@@ -46,12 +50,19 @@ pub async fn get(
 
 #[openapi(tag = "Social")]
 #[get("/social/<id>")]
-pub async fn get_by_id(db: &State<Database>, id: &str) -> Result<Json<Social>, MyError> {
+pub async fn get_by_id(
+    container: &State<crate::Container>,
+    id: &str,
+) -> Result<Json<Social>, MyError> {
     let Ok(oid) = ObjectId::parse_str(id) else {
         return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
     };
 
-    match social::find_by_id(db, oid).await {
+    let social_repo = container
+        .get::<Arc<dyn SocialRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match social_repo.find_by_id(oid).await {
         Ok(resp) => match resp {
             None => Err(MyError::build(
                 400,
@@ -69,12 +80,20 @@ pub async fn get_by_id(db: &State<Database>, id: &str) -> Result<Json<Social>, M
 #[openapi(tag = "Social")]
 #[post("/social", data = "<input>")]
 pub async fn post(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     input: Json<SocialInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
+    let social_repo = container
+        .get::<Arc<dyn SocialRepository + Send + Sync>>()
+        .ok_or_else(|| {
+            BadRequest(Json(MessageResponse {
+                message: "Service not found".to_string(),
+            }))
+        })?;
+
     // can set with a single error like this.
-    match social::insert(db, input).await {
+    match social_repo.insert(input).await {
         Ok(resp) => Ok(Json(resp)),
         Err(_error) => Err(BadRequest(Json(MessageResponse {
             message: "Invalid input".to_string(),
@@ -85,7 +104,7 @@ pub async fn post(
 #[openapi(tag = "Social")]
 #[patch("/social/<id>", data = "<input>")]
 pub async fn patch_by_id(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     id: &str,
     input: Json<SocialInput>,
@@ -94,7 +113,11 @@ pub async fn patch_by_id(
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     };
 
-    match social::update_by_id(db, oid, input).await {
+    let social_repo = container
+        .get::<Arc<dyn SocialRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match social_repo.update_by_id(oid, input).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
             None => Err(MyError::build(
@@ -112,11 +135,15 @@ pub async fn patch_by_id(
 #[openapi(tag = "Social")]
 #[patch("/social", data = "<input>")]
 pub async fn patch_many(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     input: Json<Vec<SocialsInput>>,
 ) -> Result<Json<Vec<Social>>, MyError> {
-    match social::update_many(db, input).await {
+    let social_repo = container
+        .get::<Arc<dyn SocialRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match social_repo.update_many(input).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
             None => Err(MyError::build(400, Some("Failed to update".to_string()))),
@@ -128,7 +155,7 @@ pub async fn patch_many(
 #[openapi(tag = "Social")]
 #[delete("/social/<id>")]
 pub async fn delete_by_id(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     id: &str,
     _key: ApiKey,
 ) -> Result<Json<Social>, MyError> {
@@ -136,7 +163,11 @@ pub async fn delete_by_id(
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     };
 
-    match social::delete_by_id(db, oid).await {
+    let social_repo = container
+        .get::<Arc<dyn SocialRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match social_repo.delete_by_id(oid).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
             None => Err(MyError::build(

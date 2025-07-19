@@ -1,6 +1,6 @@
 // use mongodb::bson::{doc, Document};
 use mongodb::{options::ClientOptions, Client, Database};
-use rocket::fairing::AdHoc;
+// use rocket::fairing::AdHoc;
 use std::env;
 
 pub mod customer;
@@ -9,18 +9,18 @@ pub mod project;
 pub mod skill;
 pub mod social;
 
-pub fn init() -> AdHoc {
-    AdHoc::on_ignite("Connecting to MongoDB", |rocket| async {
-        match connect().await {
-            Ok(database) => rocket.manage(database),
-            Err(error) => {
-                panic!("Cannot connect to instance:: {:?}", error)
-            }
-        }
-    })
-}
+// pub fn init() -> AdHoc {
+//     AdHoc::on_ignite("Connecting to MongoDB", |rocket| async {
+//         match connect().await {
+//             Ok(database) => rocket.manage(database),
+//             Err(error) => {
+//                 panic!("Cannot connect to instance:: {:?}", error)
+//             }
+//         }
+//     })
+// }
 
-async fn connect() -> mongodb::error::Result<Database> {
+pub async fn connect() -> mongodb::error::Result<Database> {
     let mongo_uri = env::var("MONGO_URI").expect("MONGO_URI is not found.");
     let mongo_db_name = env::var("MONGO_DB_NAME").expect("MONGO_DB_NAME is not found.");
 

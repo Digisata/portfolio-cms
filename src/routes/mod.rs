@@ -9,6 +9,7 @@ pub mod experience;
 pub mod project;
 pub mod skill;
 pub mod social;
+pub mod traits;
 
 /// This is a description. <br />You can do simple html <br /> like <b>this<b/>
 #[openapi(tag = "Hello World")]

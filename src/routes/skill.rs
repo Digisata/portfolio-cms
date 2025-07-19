@@ -1,12 +1,11 @@
-use mongodb::{
-    bson::{doc, oid::ObjectId},
-    Database,
-};
+use std::sync::Arc;
+
+use super::traits::SkillRepository;
+use mongodb::bson::{doc, oid::ObjectId};
 use rocket::{response::status::BadRequest, serde::json::Json, State};
 use rocket_okapi::openapi;
 
 use crate::{
-    db::skill,
     errors::response::MyError,
     models::{
         response::MessageResponse,
@@ -18,7 +17,7 @@ use crate::{
 #[openapi(tag = "Skill")]
 #[get("/skill?<limit>&<page>")]
 pub async fn get(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     limit: Option<i64>,
     page: Option<i64>,
 ) -> Result<Json<Vec<Skill>>, MyError> {
@@ -38,7 +37,12 @@ pub async fn get(
     // Setting default values
     let limit: i64 = limit.unwrap_or(100);
     let page: i64 = page.unwrap_or(1);
-    match skill::find(db, limit, page).await {
+
+    let skill_repo = container
+        .get::<Arc<dyn SkillRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match skill_repo.find(limit, page).await {
         Ok(resp) => Ok(Json(resp)),
         Err(error) => Err(MyError::build(400, Some(error.to_string()))),
     }
@@ -46,12 +50,19 @@ pub async fn get(
 
 #[openapi(tag = "Skill")]
 #[get("/skill/<id>")]
-pub async fn get_by_id(db: &State<Database>, id: &str) -> Result<Json<Skill>, MyError> {
+pub async fn get_by_id(
+    container: &State<crate::Container>,
+    id: &str,
+) -> Result<Json<Skill>, MyError> {
     let Ok(oid) = ObjectId::parse_str(id) else {
         return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
     };
 
-    match skill::find_by_id(db, oid).await {
+    let skill_repo = container
+        .get::<Arc<dyn SkillRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match skill_repo.find_by_id(oid).await {
         Ok(resp) => match resp {
             None => Err(MyError::build(
                 400,
@@ -69,12 +80,20 @@ pub async fn get_by_id(db: &State<Database>, id: &str) -> Result<Json<Skill>, My
 #[openapi(tag = "Skill")]
 #[post("/skill", data = "<input>")]
 pub async fn post(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     input: Json<SkillInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
+    let skill_repo = container
+        .get::<Arc<dyn SkillRepository + Send + Sync>>()
+        .ok_or_else(|| {
+            BadRequest(Json(MessageResponse {
+                message: "Service not found".to_string(),
+            }))
+        })?;
+
     // can set with a single error like this.
-    match skill::insert(db, input).await {
+    match skill_repo.insert(input).await {
         Ok(resp) => Ok(Json(resp)),
         Err(_error) => Err(BadRequest(Json(MessageResponse {
             message: "Invalid input".to_string(),
@@ -85,7 +104,7 @@ pub async fn post(
 #[openapi(tag = "Skill")]
 #[patch("/skill/<id>", data = "<input>")]
 pub async fn patch_by_id(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     id: &str,
     input: Json<SkillInput>,
@@ -94,7 +113,11 @@ pub async fn patch_by_id(
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     };
 
-    match skill::update_by_id(db, oid, input).await {
+    let skill_repo = container
+        .get::<Arc<dyn SkillRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match skill_repo.update_by_id(oid, input).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
             None => Err(MyError::build(
@@ -112,29 +135,27 @@ pub async fn patch_by_id(
 #[openapi(tag = "Skill")]
 #[patch("/skill", data = "<input>")]
 pub async fn patch_many(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     input: Json<Vec<SkillsInput>>,
 ) -> Result<Json<Vec<Skill>>, MyError> {
-    match skill::update_many(db, input).await {
+    let skill_repo = container
+        .get::<Arc<dyn SkillRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match skill_repo.update_many(input).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
-            None => Err(MyError::build(
-                400,
-                Some("Failed to update".to_string()),
-            )),
+            None => Err(MyError::build(400, Some("Failed to update".to_string()))),
         },
-        Err(_error) => Err(MyError::build(
-            400,
-            Some("Failed to update".to_string()),
-        )),
+        Err(_error) => Err(MyError::build(400, Some("Failed to update".to_string()))),
     }
 }
 
 #[openapi(tag = "Skill")]
 #[delete("/skill/<id>")]
 pub async fn delete_by_id(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     id: &str,
     _key: ApiKey,
 ) -> Result<Json<Skill>, MyError> {
@@ -142,7 +163,11 @@ pub async fn delete_by_id(
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     };
 
-    match skill::delete_by_id(db, oid).await {
+    let skill_repo = container
+        .get::<Arc<dyn SkillRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match skill_repo.delete_by_id(oid).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
             None => Err(MyError::build(

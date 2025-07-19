@@ -1,12 +1,11 @@
-use mongodb::{
-    bson::{doc, oid::ObjectId},
-    Database,
-};
+use std::sync::Arc;
+
+use mongodb::bson::{doc, oid::ObjectId};
 use rocket::{response::status::BadRequest, serde::json::Json, State};
 use rocket_okapi::openapi;
 
+use super::traits::ExperienceRepository;
 use crate::{
-    db::experience,
     errors::response::MyError,
     models::{
         experience::{Experience, ExperienceInput, ExperiencesInput},
@@ -18,7 +17,7 @@ use crate::{
 #[openapi(tag = "Experience")]
 #[get("/experience?<limit>&<page>")]
 pub async fn get(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     limit: Option<i64>,
     page: Option<i64>,
 ) -> Result<Json<Vec<Experience>>, MyError> {
@@ -38,7 +37,12 @@ pub async fn get(
     // Setting default values
     let limit: i64 = limit.unwrap_or(100);
     let page: i64 = page.unwrap_or(1);
-    match experience::find(db, limit, page).await {
+
+    let experience_repo = container
+        .get::<Arc<dyn ExperienceRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match experience_repo.find(limit, page).await {
         Ok(resp) => Ok(Json(resp)),
         Err(error) => Err(MyError::build(400, Some(error.to_string()))),
     }
@@ -47,14 +51,18 @@ pub async fn get(
 #[openapi(tag = "Experience")]
 #[get("/experience/<id>")]
 pub async fn get_by_id(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     id: &str,
 ) -> Result<Json<Experience>, MyError> {
     let Ok(oid) = ObjectId::parse_str(id) else {
         return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
     };
 
-    match experience::find_by_id(db, oid).await {
+    let experience_repo = container
+        .get::<Arc<dyn ExperienceRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match experience_repo.find_by_id(oid).await {
         Ok(resp) => match resp {
             None => Err(MyError::build(
                 400,
@@ -72,12 +80,20 @@ pub async fn get_by_id(
 #[openapi(tag = "Experience")]
 #[post("/experience", data = "<input>")]
 pub async fn post(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     input: Json<ExperienceInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
+    let experience_repo = container
+        .get::<Arc<dyn ExperienceRepository + Send + Sync>>()
+        .ok_or_else(|| {
+            BadRequest(Json(MessageResponse {
+                message: "Service not found".to_string(),
+            }))
+        })?;
+
     // can set with a single error like this.
-    match experience::insert(db, input).await {
+    match experience_repo.insert(input).await {
         Ok(resp) => Ok(Json(resp)),
         Err(_error) => Err(BadRequest(Json(MessageResponse {
             message: "Invalid input".to_string(),
@@ -88,7 +104,7 @@ pub async fn post(
 #[openapi(tag = "Experience")]
 #[patch("/experience/<id>", data = "<input>")]
 pub async fn patch_by_id(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     id: &str,
     input: Json<ExperienceInput>,
@@ -97,7 +113,11 @@ pub async fn patch_by_id(
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     };
 
-    match experience::update_by_id(db, oid, input).await {
+    let experience_repo = container
+        .get::<Arc<dyn ExperienceRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match experience_repo.update_by_id(oid, input).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
             None => Err(MyError::build(
@@ -115,29 +135,27 @@ pub async fn patch_by_id(
 #[openapi(tag = "Experience")]
 #[patch("/experience", data = "<input>")]
 pub async fn patch_many(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     _key: ApiKey,
     input: Json<Vec<ExperiencesInput>>,
 ) -> Result<Json<Vec<Experience>>, MyError> {
-    match experience::update_many(db, input).await {
+    let experience_repo = container
+        .get::<Arc<dyn ExperienceRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match experience_repo.update_many(input).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
-            None => Err(MyError::build(
-                400,
-                Some("Failed to update".to_string()),
-            )),
+            None => Err(MyError::build(400, Some("Failed to update".to_string()))),
         },
-        Err(_error) => Err(MyError::build(
-            400,
-            Some("Failed to update".to_string()),
-        )),
+        Err(_error) => Err(MyError::build(400, Some("Failed to update".to_string()))),
     }
 }
 
 #[openapi(tag = "Experience")]
 #[delete("/experience/<id>")]
 pub async fn delete_by_id(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     id: &str,
     _key: ApiKey,
 ) -> Result<Json<Experience>, MyError> {
@@ -145,7 +163,11 @@ pub async fn delete_by_id(
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     };
 
-    match experience::delete_by_id(db, oid).await {
+    let experience_repo = container
+        .get::<Arc<dyn ExperienceRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match experience_repo.delete_by_id(oid).await {
         Ok(resp) => match resp {
             Some(resp) => Ok(Json(resp)),
             None => Err(MyError::build(

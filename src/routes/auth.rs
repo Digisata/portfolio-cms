@@ -1,26 +1,33 @@
+use std::sync::Arc;
+
 use bcrypt::verify;
 use chrono::{Duration, Utc};
 use jsonwebtoken::{encode, EncodingKey, Header};
-use mongodb::{bson::doc, Database};
+use mongodb::bson::doc;
 use rocket::{serde::json::Json, State};
 use rocket_okapi::openapi;
 
 use crate::{
-    db::customer,
     errors::response::MyError,
     models::auth::{LoginInput, LoginResponse},
     request_guards::basic::Claims,
 };
 
+use super::traits::CustomerRepository;
+
 #[openapi(tag = "Auth")]
 #[post("/login", data = "<input>")]
 pub async fn login(
-    db: &State<Database>,
+    container: &State<crate::Container>,
     input: Json<LoginInput>,
 ) -> Result<Json<LoginResponse>, MyError> {
     let email = input.email.clone();
 
-    match customer::find_customer_by_email(db, email.clone()).await {
+    let customer_repo = container
+        .get::<Arc<dyn CustomerRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match customer_repo.find_customer_by_email(email.clone()).await {
         Ok(Some(customer_doc)) => {
             // Verify bcrypt password
             let password_matches = verify(&input.password, &customer_doc.password)
