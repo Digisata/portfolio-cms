@@ -29,7 +29,7 @@ const EditCustomer = ({ customer, setIsEditing, reloadCustomer }) => {
     };
 
     try {
-      await updateCustomerById(customer.id, payload, token);
+      await updateCustomerById(payload, token);
       await reloadCustomer();
       Swal.fire({
         icon: "success",

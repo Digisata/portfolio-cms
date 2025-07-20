@@ -45,11 +45,14 @@ export async function apiRequest(
 export const login = (payload, token) =>
   apiRequest("/login", "POST", payload, token);
 
-export const getCustomerDetail = (id, token = null) =>
-  apiRequest(`/customer/${id}`, "GET", null, token);
+export const register = (payload, token) =>
+  apiRequest("/register", "POST", payload, token);
 
-export const updateCustomerById = (id, data, token) =>
-  apiRequest(`/customer/${id}`, "PATCH", data, token);
+export const getCustomerDetail = (token = null) =>
+  apiRequest(`/customer`, "GET", null, token);
+
+export const updateCustomerById = (data, token) =>
+  apiRequest(`/customer`, "PATCH", data, token);
 
 export const getExperienceDetail = (id, token = null) =>
   apiRequest(`/experience/${id}`, "GET", null, token);

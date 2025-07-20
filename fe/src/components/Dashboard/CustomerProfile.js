@@ -13,7 +13,7 @@ const CustomerProfile = ({ setIsAuthenticated }) => {
     try {
       const { id, token } = getIdFromToken();
 
-      const data = await getCustomerDetail(id, token);
+      const data = await getCustomerDetail(token);
       setCustomer({ ...data, id: id });
     } catch (err) {
       Swal.fire({

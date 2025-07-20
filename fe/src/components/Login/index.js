@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { login } from "../../utils/api"; // adjust the path based on your folder structure
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = ({ setIsAuthenticated, setIsRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -54,7 +54,16 @@ const Login = ({ setIsAuthenticated }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <input style={{ marginTop: "12px" }} type="submit" value="Login" />
+        <div style={{ marginTop: "30px" }}>
+          <input type="submit" value="Login" />
+          <input
+            type="button"
+            className="muted-button"
+            value="Register"
+            style={{ marginLeft: "12px" }}
+            onClick={() => setIsRegister(true)}
+          />
+        </div>
       </form>
     </div>
   );
