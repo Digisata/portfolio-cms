@@ -24,13 +24,13 @@ export async function apiRequest(
 
   if (body) config.body = JSON.stringify(body);
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, config);
+  const response = await fetch(`${BASE_URL}/api${endpoint}`, config);
 
   if (response.status === 401) {
     // Unauthorized: clear auth state and redirect
     localStorage.removeItem("token");
     localStorage.setItem("is_authenticated", "false");
-    window.location.href = `${HOMEPAGE_URL}/dashboard`;
+    window.location.href = HOMEPAGE_URL;
     return; // Exit early
   }
 
@@ -111,5 +111,5 @@ export const getIdFromToken = () => {
 
   localStorage.removeItem("token");
   localStorage.setItem("is_authenticated", "false");
-  window.location.href = `${HOMEPAGE_URL}/dashboard`;
+  window.location.href = HOMEPAGE_URL;
 };

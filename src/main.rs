@@ -86,9 +86,9 @@ async fn rocket() -> _ {
         .manage(container)
         .attach(fairings::cors::Cors::new())
         // Serve React frontend from /var/www/html (as copied in Dockerfile)
-        .mount("/dashboard", FileServer::from("public"))
+        .mount("/", FileServer::from("public"))
         .mount(
-            "/",
+            "/api",
             openapi_get_routes![
                 routes::index,
                 routes::auth::login,
@@ -124,11 +124,11 @@ async fn rocket() -> _ {
                 routes::social::delete_by_id,
             ],
         )
-        .mount("/", routes![routes::all_options_handler])
+        .mount("/api", routes![routes::all_options_handler])
         .mount(
             "/api-docs",
             make_swagger_ui(&SwaggerUIConfig {
-                url: "../openapi.json".to_owned(),
+                url: "../api/openapi.json".to_owned(),
                 ..Default::default()
             }),
         )
