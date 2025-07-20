@@ -7,7 +7,7 @@ use rocket_okapi::openapi;
 use crate::{
     errors::response::MyError,
     models::{
-        customer::{Customer, CustomerInput},
+        customer::{Customer, CustomerInput, CustomerUpdateInput},
         response::MessageResponse,
     },
     request_guards::basic::ApiKey,
@@ -141,7 +141,7 @@ pub async fn patch_customer_by_id(
     container: &State<crate::Container>,
     _key: ApiKey,
     id: &str,
-    input: Json<CustomerInput>,
+    input: Json<CustomerUpdateInput>,
 ) -> Result<Json<Customer>, MyError> {
     let Ok(oid) = ObjectId::parse_str(id) else {
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));

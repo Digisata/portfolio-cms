@@ -1,4 +1,4 @@
-use crate::models::customer::{Customer, CustomerDocument, CustomerInput};
+use crate::models::customer::{Customer, CustomerDocument, CustomerInput, CustomerUpdateInput};
 use crate::routes::traits::CustomerRepository;
 use bcrypt::{hash, DEFAULT_COST};
 use chrono::Utc;
@@ -138,7 +138,7 @@ impl CustomerRepository for CustomerRepo {
     async fn update_customer_by_id(
         &self,
         oid: ObjectId,
-        input: Json<CustomerInput>,
+        input: Json<CustomerUpdateInput>,
     ) -> mongodb::error::Result<Option<Customer>> {
         let collection = self.db.collection::<CustomerDocument>("customer");
         let find_one_and_update_options = FindOneAndUpdateOptions::builder()

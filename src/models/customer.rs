@@ -38,6 +38,7 @@ pub struct Customer {
     pub intro: String,
     pub about: String,
     pub profile_picture: String,
+    #[serde(skip_serializing)]
     pub password: String,
     /// createdAt
     #[serde(rename = "createdAt")]
@@ -55,4 +56,16 @@ pub struct CustomerInput {
     pub about: String,
     pub profile_picture: String,
     pub password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema, Clone)]
+pub struct CustomerUpdateInput {
+    /// customer name
+    pub name: String,
+    pub email: String,
+    pub phone: String,
+    pub wa_link: String,
+    pub intro: String,
+    pub about: String,
+    pub profile_picture: String,
 }

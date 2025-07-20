@@ -1,5 +1,5 @@
 use crate::models::{
-    customer::{Customer, CustomerInput},
+    customer::{Customer, CustomerInput, CustomerUpdateInput},
     experience::{Experience, ExperienceInput, ExperiencesInput},
     project::{Project, ProjectInput, ProjectsInput},
     skill::{Skill, SkillInput, SkillsInput},
@@ -20,7 +20,7 @@ pub trait CustomerRepository {
     async fn update_customer_by_id(
         &self,
         oid: ObjectId,
-        input: Json<CustomerInput>,
+        input: Json<CustomerUpdateInput>,
     ) -> mongodb::error::Result<Option<Customer>>;
     async fn delete_customer_by_id(
         &self,
