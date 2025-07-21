@@ -2,10 +2,9 @@ use crate::models::customer::{Customer, CustomerDocument, CustomerInput, Custome
 use crate::routes::traits::CustomerRepository;
 use bcrypt::{hash, DEFAULT_COST};
 use chrono::Utc;
-use futures::stream::TryStreamExt;
 use mongodb::{
     bson::{doc, oid::ObjectId, DateTime, Document},
-    options::{FindOneAndUpdateOptions, FindOptions, ReturnDocument},
+    options::{FindOneAndUpdateOptions, ReturnDocument},
     Database,
 };
 use rocket::serde::json::Json;
@@ -22,36 +21,36 @@ impl CustomerRepo {
 
 #[async_trait]
 impl CustomerRepository for CustomerRepo {
-    async fn find_customer(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Customer>> {
-        let collection = self.db.collection::<CustomerDocument>("customer");
-
-        let find_options = FindOptions::builder()
-            .limit(limit)
-            .skip(u64::try_from((page - 1) * limit).unwrap())
-            .build();
-
-        let mut cursor = collection.find(None, find_options).await?;
-
-        let mut customers: Vec<Customer> = vec![];
-        while let Some(result) = cursor.try_next().await? {
-            // transform ObjectId to String
-            let customer_json = Customer {
-                id: result.id.to_string(),
-                name: result.name.to_string(),
-                email: result.email.to_string(),
-                phone: result.phone.to_string(),
-                wa_link: result.wa_link.to_string(),
-                intro: result.intro.to_string(),
-                about: result.about.to_string(),
-                profile_picture: result.profile_picture.to_string(),
-                password: result.password.to_string(),
-                created_at: result.created_at.to_string(),
-            };
-            customers.push(customer_json);
-        }
-
-        Ok(customers)
-    }
+    // async fn find_customer(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Customer>> {
+    //     let collection = self.db.collection::<CustomerDocument>("customer");
+    //
+    //     let find_options = FindOptions::builder()
+    //         .limit(limit)
+    //         .skip(u64::try_from((page - 1) * limit).unwrap())
+    //         .build();
+    //
+    //     let mut cursor = collection.find(None, find_options).await?;
+    //
+    //     let mut customers: Vec<Customer> = vec![];
+    //     while let Some(result) = cursor.try_next().await? {
+    //         // transform ObjectId to String
+    //         let customer_json = Customer {
+    //             id: result.id.to_string(),
+    //             name: result.name.to_string(),
+    //             email: result.email.to_string(),
+    //             phone: result.phone.to_string(),
+    //             wa_link: result.wa_link.to_string(),
+    //             intro: result.intro.to_string(),
+    //             about: result.about.to_string(),
+    //             profile_picture: result.profile_picture.to_string(),
+    //             password: result.password.to_string(),
+    //             created_at: result.created_at.to_string(),
+    //         };
+    //         customers.push(customer_json);
+    //     }
+    //
+    //     Ok(customers)
+    // }
 
     async fn find_customer_by_id(&self, oid: ObjectId) -> mongodb::error::Result<Option<Customer>> {
         let collection = self.db.collection::<CustomerDocument>("customer");
@@ -63,6 +62,35 @@ impl CustomerRepository for CustomerRepo {
         // transform ObjectId to String
         let customer_json = Customer {
             id: customer_doc.id.to_string(),
+            api_key: customer_doc.api_key.to_string(),
+            name: customer_doc.name.to_string(),
+            email: customer_doc.email.to_string(),
+            phone: customer_doc.phone.to_string(),
+            wa_link: customer_doc.wa_link.to_string(),
+            intro: customer_doc.intro.to_string(),
+            about: customer_doc.about.to_string(),
+            profile_picture: customer_doc.profile_picture.to_string(),
+            password: customer_doc.password.to_string(),
+            created_at: customer_doc.created_at.to_string(),
+        };
+
+        Ok(Some(customer_json))
+    }
+
+    async fn find_customer_by_api_key(
+        &self,
+        api_key: &str,
+    ) -> mongodb::error::Result<Option<Customer>> {
+        let collection = self.db.collection::<CustomerDocument>("customer");
+
+        let Some(customer_doc) = collection.find_one(doc! {"api_key":api_key }, None).await? else {
+            return Ok(None);
+        };
+
+        // transform ObjectId to String
+        let customer_json = Customer {
+            id: customer_doc.id.to_string(),
+            api_key: customer_doc.api_key.to_string(),
             name: customer_doc.name.to_string(),
             email: customer_doc.email.to_string(),
             phone: customer_doc.phone.to_string(),
@@ -90,6 +118,7 @@ impl CustomerRepository for CustomerRepo {
         // transform ObjectId to String
         let customer_json = Customer {
             id: customer_doc.id.to_string(),
+            api_key: customer_doc.api_key.to_string(),
             name: customer_doc.name.to_string(),
             email: customer_doc.email.to_string(),
             phone: customer_doc.phone.to_string(),
@@ -118,6 +147,7 @@ impl CustomerRepository for CustomerRepo {
         let insert_one_result = collection
             .insert_one(
                 doc! {
+                    "api_key": input.api_key.clone(),
                     "name": input.name.clone(),
                     "email": input.email.clone(),
                     "phone": input.phone.clone(),
@@ -172,6 +202,7 @@ impl CustomerRepository for CustomerRepo {
         // transform ObjectId to String
         let customer_json = Customer {
             id: customer_doc.id.to_string(),
+            api_key: customer_doc.api_key.to_string(),
             name: customer_doc.name.to_string(),
             email: customer_doc.email.to_string(),
             phone: customer_doc.phone.to_string(),
@@ -186,34 +217,34 @@ impl CustomerRepository for CustomerRepo {
         Ok(Some(customer_json))
     }
 
-    async fn delete_customer_by_id(
-        &self,
-        oid: ObjectId,
-    ) -> mongodb::error::Result<Option<Customer>> {
-        let collection = self.db.collection::<CustomerDocument>("customer");
-
-        // if you just unwrap,, when there is no document it results in 500 error.
-        let Some(customer_doc) = collection
-            .find_one_and_delete(doc! {"_id":oid }, None)
-            .await?
-        else {
-            return Ok(None);
-        };
-
-        // transform ObjectId to String
-        let customer_json = Customer {
-            id: customer_doc.id.to_string(),
-            name: customer_doc.name.to_string(),
-            email: customer_doc.email.to_string(),
-            phone: customer_doc.phone.to_string(),
-            wa_link: customer_doc.wa_link.to_string(),
-            intro: customer_doc.intro.to_string(),
-            about: customer_doc.about.to_string(),
-            profile_picture: customer_doc.profile_picture.to_string(),
-            password: customer_doc.password.to_string(),
-            created_at: customer_doc.created_at.to_string(),
-        };
-
-        Ok(Some(customer_json))
-    }
+    // async fn delete_customer_by_id(
+    //     &self,
+    //     oid: ObjectId,
+    // ) -> mongodb::error::Result<Option<Customer>> {
+    //     let collection = self.db.collection::<CustomerDocument>("customer");
+    //
+    //     // if you just unwrap,, when there is no document it results in 500 error.
+    //     let Some(customer_doc) = collection
+    //         .find_one_and_delete(doc! {"_id":oid }, None)
+    //         .await?
+    //     else {
+    //         return Ok(None);
+    //     };
+    //
+    //     // transform ObjectId to String
+    //     let customer_json = Customer {
+    //         id: customer_doc.id.to_string(),
+    //         name: customer_doc.name.to_string(),
+    //         email: customer_doc.email.to_string(),
+    //         phone: customer_doc.phone.to_string(),
+    //         wa_link: customer_doc.wa_link.to_string(),
+    //         intro: customer_doc.intro.to_string(),
+    //         about: customer_doc.about.to_string(),
+    //         profile_picture: customer_doc.profile_picture.to_string(),
+    //         password: customer_doc.password.to_string(),
+    //         created_at: customer_doc.created_at.to_string(),
+    //     };
+    //
+    //     Ok(Some(customer_json))
+    // }
 }

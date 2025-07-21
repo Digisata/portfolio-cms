@@ -57,8 +57,7 @@ const CustomerProfile = ({ setIsAuthenticated }) => {
             <strong>Profile Picture:</strong> {customer.profile_picture}
           </p>
           <p>
-            <strong>Created At:</strong>{" "}
-            {new Date(customer.createdAt).toLocaleString()}
+            <strong>API KEY:</strong> {customer.api_key}
           </p>
           <div style={{ marginTop: "30px", marginBottom: "18px" }}>
             <button onClick={() => setIsEditing(true)}>Edit Profile</button>

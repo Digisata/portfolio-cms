@@ -15,6 +15,7 @@ use crate::{
         response::MessageResponse,
     },
     request_guards::basic::Claims,
+    utils::util::generate_api_key,
 };
 
 use super::traits::CustomerRepository;
@@ -98,7 +99,10 @@ pub async fn register(
 
         // Either not found or error
         Ok(None) => {
+            let api_key = generate_api_key();
+
             let customer_input = CustomerInput {
+                api_key,
                 name: "".to_string(),
                 email: input.email.clone(),
                 phone: "".to_string(),

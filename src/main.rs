@@ -19,6 +19,7 @@ mod fairings;
 mod models;
 mod request_guards;
 mod routes;
+mod utils;
 
 pub struct Container {
     services: HashMap<TypeId, Box<dyn Any + Send + Sync>>,
@@ -95,7 +96,7 @@ async fn rocket() -> _ {
                 routes::auth::register,
                 // routes::customer::get_customers,
                 routes::customer::get_customer_by_id,
-                routes::customer::get_customer_by_email,
+                routes::customer::get_customer_profile,
                 // routes::customer::post_customer,
                 routes::customer::patch_customer_by_id,
                 // routes::customer::delete_customer_by_id,

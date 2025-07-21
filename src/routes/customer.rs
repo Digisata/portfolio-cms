@@ -7,7 +7,7 @@ use rocket_okapi::openapi;
 use crate::{
     errors::response::MyError,
     models::customer::{Customer, CustomerUpdateInput},
-    request_guards::basic::ApiKey,
+    request_guards::basic::{ApiKey, ClientApiKey},
 };
 
 use super::traits::CustomerRepository;
@@ -84,29 +84,26 @@ pub async fn get_customer_by_id(
 }
 
 #[openapi(tag = "Customer")]
-#[get("/customer/email/<email>")]
-pub async fn get_customer_by_email(
+#[get("/customer/profile")]
+pub async fn get_customer_profile(
     container: &State<crate::Container>,
-    email: &str,
+    client_key: ClientApiKey,
 ) -> Result<Json<Customer>, MyError> {
     let customer_repo = container
         .get::<Arc<dyn CustomerRepository + Send + Sync>>()
         .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
 
-    match customer_repo
-        .find_customer_by_email(email.to_string())
-        .await
-    {
+    match customer_repo.find_customer_by_api_key(&client_key.0).await {
         Ok(customer_doc) => match customer_doc {
             None => Err(MyError::build(
                 400,
-                Some(format!("Customer not found with email {}", email)),
+                Some(format!("Customer not found with api key {}", client_key.0)),
             )),
             Some(customer_doc) => Ok(Json(customer_doc)),
         },
         Err(_error) => Err(MyError::build(
             400,
-            Some(format!("Customer not found with email {}", email)),
+            Some(format!("Customer not found with api key {}", client_key.0)),
         )),
     }
 }

@@ -11,7 +11,7 @@ use crate::{
         experience::{Experience, ExperienceInput, ExperiencesInput},
         response::MessageResponse,
     },
-    request_guards::basic::ApiKey,
+    request_guards::basic::{ApiKey, ClientApiKey},
 };
 
 #[openapi(tag = "Experience")]
@@ -58,12 +58,12 @@ pub async fn get_all(
 }
 
 #[openapi(tag = "Experience")]
-#[get("/<email>/experience?<limit>&<page>")]
+#[get("/experiences?<limit>&<page>")]
 pub async fn get(
     container: &State<crate::Container>,
+    client_key: ClientApiKey,
     limit: Option<i64>,
     page: Option<i64>,
-    email: &str,
 ) -> Result<Json<Vec<Experience>>, MyError> {
     // Error handling
     // This is also valid when strict checking is necessary.
@@ -90,10 +90,7 @@ pub async fn get(
         .get::<Arc<dyn CustomerRepository + Send + Sync>>()
         .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
 
-    match customer_repo
-        .find_customer_by_email(email.to_string())
-        .await
-    {
+    match customer_repo.find_customer_by_api_key(&client_key.0).await {
         Ok(Some(customer_doc)) => {
             let Ok(oid) = ObjectId::parse_str(customer_doc.id) else {
                 return Err(MyError::build(

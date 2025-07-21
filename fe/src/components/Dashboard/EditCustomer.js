@@ -100,6 +100,9 @@ const EditCustomer = ({ customer, setIsEditing, reloadCustomer }) => {
         onChange={(e) => setProfilePicture(e.target.value)}
       />
 
+      <label>API KEY</label>
+      <input type="text" value={customer.api_key} readOnly />
+
       <div style={{ marginTop: "30px" }}>
         <input type="submit" value="Update" />
         <input

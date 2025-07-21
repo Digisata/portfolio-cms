@@ -93,3 +93,59 @@ impl<'a> OpenApiFromRequest<'a> for ApiKey {
         })
     }
 }
+
+#[derive(Debug)]
+pub struct ClientApiKey(pub String);
+
+#[derive(Debug)]
+pub enum ClientApiKeyError {
+    Missing,
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for ClientApiKey {
+    type Error = ClientApiKeyError;
+
+    async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        match req.headers().get_one("X-API-KEY") {
+            Some(key) => Outcome::Success(ClientApiKey(key.to_string())),
+            None => Outcome::Error((Status::Unauthorized, ClientApiKeyError::Missing)),
+        }
+    }
+}
+
+impl<'a> OpenApiFromRequest<'a> for ClientApiKey {
+    fn from_request_input(
+        _gen: &mut OpenApiGenerator,
+        _name: String,
+        _required: bool,
+    ) -> rocket_okapi::Result<RequestHeaderInput> {
+        let security_scheme = SecurityScheme {
+            description: Some("X-API-KEY header required".to_string()),
+            data: SecuritySchemeData::ApiKey {
+                name: "X-API-KEY".to_string(),
+                location: "header".to_string(),
+            },
+            extensions: Object::default(),
+        };
+
+        let mut security_req = SecurityRequirement::new();
+        security_req.insert("ApiKeyAuth".to_string(), Vec::new());
+
+        Ok(RequestHeaderInput::Security(
+            "ApiKeyAuth".to_string(),
+            security_scheme,
+            security_req,
+        ))
+    }
+
+    fn get_responses(gen: &mut OpenApiGenerator) -> rocket_okapi::Result<Responses> {
+        use rocket_okapi::okapi::openapi3::RefOr;
+        Ok(Responses {
+            responses: okapi::map! {
+                "401".to_owned() => RefOr::Object(crate::errors::response::unauthorized_response(gen)),
+            },
+            ..Default::default()
+        })
+    }
+}

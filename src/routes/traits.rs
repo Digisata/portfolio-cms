@@ -10,8 +10,9 @@ use rocket::serde::json::Json;
 
 #[async_trait]
 pub trait CustomerRepository {
-    async fn find_customer(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Customer>>;
+    // async fn find_customer(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Customer>>;
     async fn find_customer_by_id(&self, oid: ObjectId) -> mongodb::error::Result<Option<Customer>>;
+    async fn find_customer_by_api_key(&self, api_key: &str) -> mongodb::error::Result<Option<Customer>>;
     async fn find_customer_by_email(
         &self,
         email: String,
@@ -22,10 +23,10 @@ pub trait CustomerRepository {
         oid: ObjectId,
         input: Json<CustomerUpdateInput>,
     ) -> mongodb::error::Result<Option<Customer>>;
-    async fn delete_customer_by_id(
-        &self,
-        oid: ObjectId,
-    ) -> mongodb::error::Result<Option<Customer>>;
+    // async fn delete_customer_by_id(
+    //     &self,
+    //     oid: ObjectId,
+    // ) -> mongodb::error::Result<Option<Customer>>;
 }
 
 #[async_trait]

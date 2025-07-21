@@ -9,6 +9,7 @@ pub struct CustomerDocument {
     #[serde(rename = "_id")]
     pub id: ObjectId,
     /// customer name
+    pub api_key: String,
     pub name: String,
     pub email: String,
     pub phone: String,
@@ -31,6 +32,7 @@ pub struct Customer {
     #[serde(rename = "_id")]
     pub id: String,
     /// customer name
+    pub api_key: String,
     pub name: String,
     pub email: String,
     pub phone: String,
@@ -48,6 +50,7 @@ pub struct Customer {
 #[derive(Debug, Serialize, Deserialize, JsonSchema, Clone)]
 pub struct CustomerInput {
     /// customer name
+    pub api_key: String,
     pub name: String,
     pub email: String,
     pub phone: String,
