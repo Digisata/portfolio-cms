@@ -1,11 +1,9 @@
-import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { getCustomerDetail, getIdFromToken } from "../../utils/api";
 import EditCustomer from "./EditCustomer";
-import Logout from "../Logout";
 
-const CustomerProfile = ({ setIsAuthenticated }) => {
+const CustomerProfile = () => {
   const [customer, setCustomer] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -61,7 +59,6 @@ const CustomerProfile = ({ setIsAuthenticated }) => {
           </p>
           <div style={{ marginTop: "30px", marginBottom: "18px" }}>
             <button onClick={() => setIsEditing(true)}>Edit Profile</button>
-            <Logout setIsAuthenticated={setIsAuthenticated} />
           </div>
         </div>
       ) : (

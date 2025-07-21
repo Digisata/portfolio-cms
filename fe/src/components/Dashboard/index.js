@@ -36,6 +36,7 @@ import {
 } from "../../utils/api";
 
 import CustomerProfile from "./CustomerProfile"; // ✅ new import
+import Logout from "../Logout";
 
 const Dashboard = ({ setIsAuthenticated }) => {
   const [experiences, setExperiences] = useState([]);
@@ -309,7 +310,16 @@ const Dashboard = ({ setIsAuthenticated }) => {
 
   return (
     <div className="container">
-      <h1>Portfolio CMS</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>Portfolio CMS</h1>
+        <Logout setIsAuthenticated={setIsAuthenticated} />
+      </div>
 
       <hr style={{ margin: "40px 0" }} />
       <CustomerProfile setIsAuthenticated={setIsAuthenticated} />
