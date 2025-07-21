@@ -8,6 +8,7 @@ pub struct SkillDocument {
     /// Document Id
     #[serde(rename = "_id")]
     pub id: ObjectId,
+    pub customer_id: ObjectId,
     pub name: String,
     pub order: i32,
     /// createdAt
@@ -23,6 +24,7 @@ pub struct Skill {
     /// Document Id
     #[serde(rename = "_id")]
     pub id: String,
+    pub customer_id: String,
     pub name: String,
     pub order: i32,
     /// createdAt

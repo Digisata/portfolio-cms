@@ -21,8 +21,15 @@ impl SkillRepo {
 
 #[async_trait]
 impl SkillRepository for SkillRepo {
-    async fn find(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Skill>> {
+    async fn find(
+        &self,
+        limit: i64,
+        page: i64,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<Vec<Skill>> {
         let collection = self.db.collection::<SkillDocument>("skill");
+
+        let filter = doc! { "customer_id": oid };
 
         let find_options = FindOptions::builder()
             .sort(doc! { "order": 1 })
@@ -30,13 +37,14 @@ impl SkillRepository for SkillRepo {
             .skip(u64::try_from((page - 1) * limit).unwrap())
             .build();
 
-        let mut cursor = collection.find(None, find_options).await?;
+        let mut cursor = collection.find(filter, find_options).await?;
 
         let mut resp: Vec<Skill> = vec![];
         while let Some(result) = cursor.try_next().await? {
             // transform ObjectId to String
             let json_resp = Skill {
                 id: result.id.to_string(),
+                customer_id: result.customer_id.to_string(),
                 name: result.name,
                 order: result.order,
                 created_at: result.created_at.to_string(),
@@ -57,6 +65,7 @@ impl SkillRepository for SkillRepo {
         // transform ObjectId to String
         let resp = Skill {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             order: result.order,
             created_at: result.created_at.to_string(),
@@ -65,7 +74,11 @@ impl SkillRepository for SkillRepo {
         Ok(Some(resp))
     }
 
-    async fn insert(&self, input: Json<SkillInput>) -> mongodb::error::Result<String> {
+    async fn insert(
+        &self,
+        input: Json<SkillInput>,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<String> {
         let collection = self.db.collection::<Document>("skill");
 
         let created_at = mongodb::bson::DateTime::from_chrono(Utc::now());
@@ -73,6 +86,7 @@ impl SkillRepository for SkillRepo {
         let resp = collection
             .insert_one(
                 doc! {
+                    "customer_id": oid,
                     "name": input.name.clone(),
                     "order": input.order,
                     "created_at": created_at,
@@ -113,6 +127,7 @@ impl SkillRepository for SkillRepo {
         // transform ObjectId to String
         let resp = Skill {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             order: result.order,
             created_at: result.created_at.to_string(),
@@ -153,6 +168,7 @@ impl SkillRepository for SkillRepo {
             {
                 updated_projects.push(Skill {
                     id: result.id.to_string(),
+                    customer_id: result.customer_id.to_string(),
                     name: result.name,
                     order: result.order,
                     created_at: result.created_at.to_string(),
@@ -181,6 +197,7 @@ impl SkillRepository for SkillRepo {
         // transform ObjectId to String
         let resp = Skill {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             order: result.order,
             created_at: result.created_at.to_string(),

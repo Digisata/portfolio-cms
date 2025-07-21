@@ -29,6 +29,10 @@ import {
   getSocialDetail,
   deleteSocialById,
   apiRequest,
+  getExperience,
+  getProject,
+  getSkill,
+  getSocial,
 } from "../../utils/api";
 
 import CustomerProfile from "./CustomerProfile"; // ✅ new import
@@ -58,7 +62,8 @@ const Dashboard = ({ setIsAuthenticated }) => {
 
   const loadExperiences = async () => {
     try {
-      const data = await apiRequest("/experience");
+      const token = localStorage.getItem("token");
+      const data = await getExperience(token);
       setExperiences(data);
     } catch (err) {
       setError(err.message || "Failed to load experiences");
@@ -67,7 +72,8 @@ const Dashboard = ({ setIsAuthenticated }) => {
 
   const loadProjects = async () => {
     try {
-      const data = await apiRequest("/project");
+      const token = localStorage.getItem("token");
+      const data = await getProject(token);
       setProjects(data);
     } catch (err) {
       setError(err.message || "Failed to load projects");
@@ -76,7 +82,8 @@ const Dashboard = ({ setIsAuthenticated }) => {
 
   const loadSkills = async () => {
     try {
-      const data = await apiRequest("/skill");
+      const token = localStorage.getItem("token");
+      const data = await getSkill(token);
       setSkills(data);
     } catch (err) {
       setError(err.message || "Failed to load skills");
@@ -85,7 +92,8 @@ const Dashboard = ({ setIsAuthenticated }) => {
 
   const loadSocials = async () => {
     try {
-      const data = await apiRequest("/social");
+      const token = localStorage.getItem("token");
+      const data = await getSocial(token);
       setSocials(data);
     } catch (err) {
       setError(err.message || "Failed to load socials");

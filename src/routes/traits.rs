@@ -30,9 +30,18 @@ pub trait CustomerRepository {
 
 #[async_trait]
 pub trait ExperienceRepository {
-    async fn find(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Experience>>;
+    async fn find(
+        &self,
+        limit: i64,
+        page: i64,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<Vec<Experience>>;
     async fn find_by_id(&self, oid: ObjectId) -> mongodb::error::Result<Option<Experience>>;
-    async fn insert(&self, input: Json<ExperienceInput>) -> mongodb::error::Result<String>;
+    async fn insert(
+        &self,
+        input: Json<ExperienceInput>,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<String>;
     async fn update_by_id(
         &self,
         oid: ObjectId,
@@ -47,9 +56,18 @@ pub trait ExperienceRepository {
 
 #[async_trait]
 pub trait ProjectRepository {
-    async fn find(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Project>>;
+    async fn find(
+        &self,
+        limit: i64,
+        page: i64,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<Vec<Project>>;
     async fn find_by_id(&self, oid: ObjectId) -> mongodb::error::Result<Option<Project>>;
-    async fn insert(&self, input: Json<ProjectInput>) -> mongodb::error::Result<String>;
+    async fn insert(
+        &self,
+        input: Json<ProjectInput>,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<String>;
     async fn update_by_id(
         &self,
         oid: ObjectId,
@@ -64,9 +82,18 @@ pub trait ProjectRepository {
 
 #[async_trait]
 pub trait SkillRepository {
-    async fn find(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Skill>>;
+    async fn find(
+        &self,
+        limit: i64,
+        page: i64,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<Vec<Skill>>;
     async fn find_by_id(&self, oid: ObjectId) -> mongodb::error::Result<Option<Skill>>;
-    async fn insert(&self, input: Json<SkillInput>) -> mongodb::error::Result<String>;
+    async fn insert(
+        &self,
+        input: Json<SkillInput>,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<String>;
     async fn update_by_id(
         &self,
         oid: ObjectId,
@@ -81,9 +108,18 @@ pub trait SkillRepository {
 
 #[async_trait]
 pub trait SocialRepository {
-    async fn find(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Social>>;
+    async fn find(
+        &self,
+        limit: i64,
+        page: i64,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<Vec<Social>>;
     async fn find_by_id(&self, oid: ObjectId) -> mongodb::error::Result<Option<Social>>;
-    async fn insert(&self, input: Json<SocialInput>) -> mongodb::error::Result<String>;
+    async fn insert(
+        &self,
+        input: Json<SocialInput>,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<String>;
     async fn update_by_id(
         &self,
         oid: ObjectId,

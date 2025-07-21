@@ -23,8 +23,15 @@ impl ExperienceRepo {
 
 #[async_trait]
 impl ExperienceRepository for ExperienceRepo {
-    async fn find(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Experience>> {
+    async fn find(
+        &self,
+        limit: i64,
+        page: i64,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<Vec<Experience>> {
         let collection = self.db.collection::<ExperienceDocument>("experience");
+
+        let filter = doc! { "customer_id": oid };
 
         let find_options = FindOptions::builder()
             .sort(doc! { "order": 1 })
@@ -32,12 +39,13 @@ impl ExperienceRepository for ExperienceRepo {
             .skip(u64::try_from((page - 1) * limit).unwrap())
             .build();
 
-        let mut cursor = collection.find(None, find_options).await?;
-
+        let mut cursor = collection.find(filter, find_options).await?;
         let mut resp: Vec<Experience> = vec![];
+
         while let Some(result) = cursor.try_next().await? {
             let mut json_resp = Experience {
                 id: result.id.to_string(),
+                customer_id: result.customer_id.to_string(),
                 company: result.company,
                 work_type: result.work_type,
                 location: result.location,
@@ -71,6 +79,7 @@ impl ExperienceRepository for ExperienceRepo {
         // transform ObjectId to String
         let mut resp = Experience {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             company: result.company,
             work_type: result.work_type,
             location: result.location,
@@ -91,7 +100,11 @@ impl ExperienceRepository for ExperienceRepo {
         Ok(Some(resp))
     }
 
-    async fn insert(&self, input: Json<ExperienceInput>) -> mongodb::error::Result<String> {
+    async fn insert(
+        &self,
+        input: Json<ExperienceInput>,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<String> {
         let collection = self.db.collection::<Document>("experience");
 
         let created_at = mongodb::bson::DateTime::from_chrono(Utc::now());
@@ -101,6 +114,7 @@ impl ExperienceRepository for ExperienceRepo {
         let resp = collection
             .insert_one(
                 doc! {
+                    "customer_id": oid,
                     "company": input.company.clone(),
                     "work_type": input.work_type.clone(),
                     "location": input.location.clone(),
@@ -158,6 +172,7 @@ impl ExperienceRepository for ExperienceRepo {
         // transform ObjectId to String
         let resp = Experience {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             company: result.company,
             work_type: result.work_type,
             location: result.location,
@@ -215,6 +230,7 @@ impl ExperienceRepository for ExperienceRepo {
             {
                 updated_projects.push(Experience {
                     id: result.id.to_string(),
+                    customer_id: result.customer_id.to_string(),
                     company: result.company,
                     work_type: result.work_type,
                     location: result.location,
@@ -250,6 +266,7 @@ impl ExperienceRepository for ExperienceRepo {
         // transform ObjectId to String
         let resp = Experience {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             company: result.company,
             work_type: result.work_type,
             location: result.location,

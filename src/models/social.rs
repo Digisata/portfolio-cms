@@ -8,6 +8,7 @@ pub struct SocialDocument {
     /// Document Id
     #[serde(rename = "_id")]
     pub id: ObjectId,
+    pub customer_id: ObjectId,
     pub name: String,
     pub link: String,
     pub order: i32,
@@ -24,6 +25,7 @@ pub struct Social {
     /// Document Id
     #[serde(rename = "_id")]
     pub id: String,
+    pub customer_id: String,
     pub name: String,
     pub link: String,
     pub order: i32,

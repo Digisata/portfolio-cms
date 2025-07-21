@@ -21,8 +21,15 @@ impl SocialRepo {
 
 #[async_trait]
 impl SocialRepository for SocialRepo {
-    async fn find(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Social>> {
+    async fn find(
+        &self,
+        limit: i64,
+        page: i64,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<Vec<Social>> {
         let collection = self.db.collection::<SocialDocument>("social");
+
+        let filter = doc! { "customer_id": oid };
 
         let find_options = FindOptions::builder()
             .sort(doc! { "order": 1 })
@@ -30,13 +37,14 @@ impl SocialRepository for SocialRepo {
             .skip(u64::try_from((page - 1) * limit).unwrap())
             .build();
 
-        let mut cursor = collection.find(None, find_options).await?;
+        let mut cursor = collection.find(filter, find_options).await?;
 
         let mut resp: Vec<Social> = vec![];
         while let Some(result) = cursor.try_next().await? {
             // transform ObjectId to String
             let json_resp = Social {
                 id: result.id.to_string(),
+                customer_id: result.customer_id.to_string(),
                 name: result.name,
                 link: result.link,
                 order: result.order,
@@ -58,6 +66,7 @@ impl SocialRepository for SocialRepo {
         // transform ObjectId to String
         let resp = Social {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             link: result.link,
             order: result.order,
@@ -67,7 +76,11 @@ impl SocialRepository for SocialRepo {
         Ok(Some(resp))
     }
 
-    async fn insert(&self, input: Json<SocialInput>) -> mongodb::error::Result<String> {
+    async fn insert(
+        &self,
+        input: Json<SocialInput>,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<String> {
         let collection = self.db.collection::<Document>("social");
 
         let created_at = mongodb::bson::DateTime::from_chrono(Utc::now());
@@ -75,6 +88,7 @@ impl SocialRepository for SocialRepo {
         let resp = collection
             .insert_one(
                 doc! {
+                    "customer_id": oid,
                     "name": input.name.clone(),
                     "link": input.link.clone(),
                     "order": input.order,
@@ -117,6 +131,7 @@ impl SocialRepository for SocialRepo {
         // transform ObjectId to String
         let resp = Social {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             link: result.link,
             order: result.order,
@@ -159,6 +174,7 @@ impl SocialRepository for SocialRepo {
             {
                 updated_projects.push(Social {
                     id: result.id.to_string(),
+                    customer_id: result.customer_id.to_string(),
                     name: result.name,
                     link: result.link,
                     order: result.order,
@@ -188,6 +204,7 @@ impl SocialRepository for SocialRepo {
         // transform ObjectId to String
         let resp = Social {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             link: result.link,
             order: result.order,

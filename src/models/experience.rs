@@ -8,6 +8,7 @@ pub struct ExperienceDocument {
     /// Document Id
     #[serde(rename = "_id")]
     pub id: ObjectId,
+    pub customer_id: ObjectId,
     pub company: String,
     pub work_type: String,
     pub location: String,
@@ -32,6 +33,7 @@ pub struct Experience {
     /// Document Id
     #[serde(rename = "_id")]
     pub id: String,
+    pub customer_id: String,
     pub company: String,
     pub work_type: String,
     pub location: String,

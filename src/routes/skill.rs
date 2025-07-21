@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::traits::SkillRepository;
+use super::traits::{CustomerRepository, SkillRepository};
 use mongodb::bson::{doc, oid::ObjectId};
 use rocket::{response::status::BadRequest, serde::json::Json, State};
 use rocket_okapi::openapi;
@@ -16,10 +16,55 @@ use crate::{
 
 #[openapi(tag = "Skill")]
 #[get("/skill?<limit>&<page>")]
+pub async fn get_all(
+    container: &State<crate::Container>,
+    key: ApiKey,
+    limit: Option<i64>,
+    page: Option<i64>,
+) -> Result<Json<Vec<Skill>>, MyError> {
+    // Error handling
+    // This is also valid when strict checking is necessary.
+    // if limit < 0 {
+    //     return Err(BadRequest(Some(Json(MessageResponse {
+    //         message: "limit cannot be less than 0".to_string(),
+    //     }))));
+    // }
+    // if !page.is_none() && page.unwrap() < 1 {
+    //     return Err(BadRequest(Some(Json(MessageResponse {
+    //         message: "page cannot be less than 1".to_string(),
+    //     }))));
+    // }
+
+    // Setting default values
+    let limit: i64 = limit.unwrap_or(100);
+    let page: i64 = page.unwrap_or(1);
+
+    let claims = &key.0; // Access the Claims struct
+    let id = &claims.sub;
+    let Ok(oid) = ObjectId::parse_str(id) else {
+        return Err(MyError::build(
+            400,
+            Some("Invalid user id format.".to_string()),
+        ));
+    };
+
+    let skill_repo = container
+        .get::<Arc<dyn SkillRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match skill_repo.find(limit, page, oid).await {
+        Ok(resp) => Ok(Json(resp)),
+        Err(error) => Err(MyError::build(400, Some(error.to_string()))),
+    }
+}
+
+#[openapi(tag = "Skill")]
+#[get("/<email>/skill?<limit>&<page>")]
 pub async fn get(
     container: &State<crate::Container>,
     limit: Option<i64>,
     page: Option<i64>,
+    email: &str,
 ) -> Result<Json<Vec<Skill>>, MyError> {
     // Error handling
     // This is also valid when strict checking is necessary.
@@ -42,9 +87,33 @@ pub async fn get(
         .get::<Arc<dyn SkillRepository + Send + Sync>>()
         .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
 
-    match skill_repo.find(limit, page).await {
-        Ok(resp) => Ok(Json(resp)),
-        Err(error) => Err(MyError::build(400, Some(error.to_string()))),
+    let customer_repo = container
+        .get::<Arc<dyn CustomerRepository + Send + Sync>>()
+        .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
+
+    match customer_repo
+        .find_customer_by_email(email.to_string())
+        .await
+    {
+        Ok(Some(customer_doc)) => {
+            let Ok(oid) = ObjectId::parse_str(customer_doc.id) else {
+                return Err(MyError::build(
+                    400,
+                    Some("Invalid user id format.".to_string()),
+                ));
+            };
+
+            match skill_repo.find(limit, page, oid).await {
+                Ok(resp) => Ok(Json(resp)),
+                Err(error) => Err(MyError::build(400, Some(error.to_string()))),
+            }
+        }
+
+        // Either not found or error
+        Ok(None) | Err(_) => Err(MyError::build(
+            400,
+            Some("Incorrect email or password".to_string()),
+        )),
     }
 }
 
@@ -52,6 +121,7 @@ pub async fn get(
 #[get("/skill/<id>")]
 pub async fn get_by_id(
     container: &State<crate::Container>,
+    _key: ApiKey,
     id: &str,
 ) -> Result<Json<Skill>, MyError> {
     let Ok(oid) = ObjectId::parse_str(id) else {
@@ -81,7 +151,7 @@ pub async fn get_by_id(
 #[post("/skill", data = "<input>")]
 pub async fn post(
     container: &State<crate::Container>,
-    _key: ApiKey,
+    key: ApiKey,
     input: Json<SkillInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
     let skill_repo = container
@@ -92,8 +162,16 @@ pub async fn post(
             }))
         })?;
 
+    let claims = &key.0; // Access the Claims struct
+    let id = &claims.sub;
+    let Ok(oid) = ObjectId::parse_str(id) else {
+        return Err(BadRequest(Json(MessageResponse {
+            message: "Invalid user id format".to_string(),
+        })));
+    };
+
     // can set with a single error like this.
-    match skill_repo.insert(input).await {
+    match skill_repo.insert(input, oid).await {
         Ok(resp) => Ok(Json(resp)),
         Err(_error) => Err(BadRequest(Json(MessageResponse {
             message: "Invalid input".to_string(),

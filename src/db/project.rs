@@ -21,8 +21,15 @@ impl ProjectRepo {
 
 #[async_trait]
 impl ProjectRepository for ProjectRepo {
-    async fn find(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Project>> {
+    async fn find(
+        &self,
+        limit: i64,
+        page: i64,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<Vec<Project>> {
         let collection = self.db.collection::<ProjectDocument>("project");
+
+        let filter = doc! { "customer_id": oid };
 
         let find_options = FindOptions::builder()
             .sort(doc! { "order": 1 })
@@ -30,13 +37,14 @@ impl ProjectRepository for ProjectRepo {
             .skip(u64::try_from((page - 1) * limit).unwrap())
             .build();
 
-        let mut cursor = collection.find(None, find_options).await?;
+        let mut cursor = collection.find(filter, find_options).await?;
 
         let mut resp: Vec<Project> = vec![];
         while let Some(result) = cursor.try_next().await? {
             // transform ObjectId to String
             let json_resp = Project {
                 id: result.id.to_string(),
+                customer_id: result.customer_id.to_string(),
                 name: result.name,
                 description: result.description,
                 link: result.link,
@@ -61,6 +69,7 @@ impl ProjectRepository for ProjectRepo {
         // transform ObjectId to String
         let resp = Project {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             description: result.description,
             link: result.link,
@@ -73,7 +82,11 @@ impl ProjectRepository for ProjectRepo {
         Ok(Some(resp))
     }
 
-    async fn insert(&self, input: Json<ProjectInput>) -> mongodb::error::Result<String> {
+    async fn insert(
+        &self,
+        input: Json<ProjectInput>,
+        oid: ObjectId,
+    ) -> mongodb::error::Result<String> {
         let collection = self.db.collection::<Document>("project");
 
         let created_at = mongodb::bson::DateTime::from_chrono(Utc::now());
@@ -81,6 +94,7 @@ impl ProjectRepository for ProjectRepo {
         let resp = collection
             .insert_one(
                 doc! {
+                    "customer_id": oid,
                     "name": input.name.clone(),
                     "description": input.description.clone(),
                     "link": input.link.clone(),
@@ -129,6 +143,7 @@ impl ProjectRepository for ProjectRepo {
         // transform ObjectId to String
         let resp = Project {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             description: result.description,
             link: result.link,
@@ -177,6 +192,7 @@ impl ProjectRepository for ProjectRepo {
             {
                 updated_projects.push(Project {
                     id: result.id.to_string(),
+                    customer_id: result.customer_id.to_string(),
                     name: result.name,
                     description: result.description,
                     link: result.link,
@@ -209,6 +225,7 @@ impl ProjectRepository for ProjectRepo {
         // transform ObjectId to String
         let resp = Project {
             id: result.id.to_string(),
+            customer_id: result.customer_id.to_string(),
             name: result.name,
             description: result.description,
             link: result.link,

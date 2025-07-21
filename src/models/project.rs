@@ -8,6 +8,7 @@ pub struct ProjectDocument {
     /// Document Id
     #[serde(rename = "_id")]
     pub id: ObjectId,
+    pub customer_id: ObjectId,
     pub name: String,
     pub description: String,
     pub link: String,
@@ -27,6 +28,7 @@ pub struct Project {
     /// Document Id
     #[serde(rename = "_id")]
     pub id: String,
+    pub customer_id: String,
     pub name: String,
     pub description: String,
     pub link: String,

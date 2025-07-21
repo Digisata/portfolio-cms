@@ -15,8 +15,27 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
   const [endDate, setEndDate] = useState("");
   const [isPresent, setIsPresent] = useState(false);
   const [position, setPosition] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState([""]);
   const [order, setOrder] = useState(1);
+
+  const handleDescriptionChange = (index, value) => {
+    setDescription((prev) => {
+      const updatedDescriptions = [...prev];
+      updatedDescriptions[index] = value;
+      return updatedDescriptions;
+    });
+  };
+
+  const addDescriptionField = () => {
+    setDescription((prev) => [...prev, ""]);
+  };
+
+  const removeDescriptionField = (index) => {
+    setDescription((prev) => {
+      const updatedDescriptions = prev.filter((_, i) => i !== index);
+      return updatedDescriptions;
+    });
+  };
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -138,10 +157,53 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
         />
 
         <label>Description</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+        {description.map((desc, index) => (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "8px",
+            }}
+          >
+            <input
+              type="text"
+              value={desc}
+              onChange={(e) => handleDescriptionChange(index, e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              onClick={() => removeDescriptionField(index)}
+              style={{
+                marginLeft: "8px",
+                padding: "4px 8px",
+                background: "#ff4d4f",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              ❌
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addDescriptionField}
+          style={{
+            marginTop: "8px",
+            padding: "6px 12px",
+            background: "#1890ff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          ➕ Add Description
+        </button>
 
         <label>Order</label>
         <input
@@ -171,7 +233,26 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
   const [link, setLink] = useState("");
   const [photoLink, setPhotoLink] = useState("");
   const [order, setOrder] = useState(1);
-  const [stack, setStack] = useState("");
+  const [stack, setStack] = useState([""]);
+
+  const handleStackChange = (index, value) => {
+    setStack((prev) => {
+      const updatedStack = [...prev];
+      updatedStack[index] = value;
+      return updatedStack;
+    });
+  };
+
+  const addStackField = () => {
+    setStack((prev) => [...prev, ""]);
+  };
+
+  const removeStackField = (index) => {
+    setStack((prev) => {
+      const updatedStacks = prev.filter((_, i) => i !== index);
+      return updatedStacks;
+    });
+  };
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -193,7 +274,7 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
       link,
       photo_link: photoLink,
       order: Number(order),
-      stack: stack.split(",").map((s) => s.trim()), // Convert comma-separated string to array
+      stack,
     };
 
     try {
@@ -248,8 +329,54 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
           onChange={(e) => setOrder(e.target.value)}
         />
 
-        <label>Stack (comma-separated)</label>
-        <input value={stack} onChange={(e) => setStack(e.target.value)} />
+        <label>Stack</label>
+        {stack.map((desc, index) => (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "8px",
+            }}
+          >
+            <input
+              type="text"
+              value={desc}
+              onChange={(e) => handleStackChange(index, e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              onClick={() => removeStackField(index)}
+              style={{
+                marginLeft: "8px",
+                padding: "4px 8px",
+                background: "#ff4d4f",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              ❌
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addStackField}
+          style={{
+            marginTop: "8px",
+            padding: "6px 12px",
+            background: "#1890ff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          ➕ Add Stack
+        </button>
 
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Add" />

@@ -54,6 +54,9 @@ export const getCustomerDetail = (token = null) =>
 export const updateCustomerById = (data, token) =>
   apiRequest(`/customer`, "PATCH", data, token);
 
+export const getExperience = (token = null) =>
+  apiRequest(`/experience`, "GET", null, token);
+
 export const getExperienceDetail = (id, token = null) =>
   apiRequest(`/experience/${id}`, "GET", null, token);
 
@@ -65,6 +68,9 @@ export const deleteExperienceById = (id, token) =>
 
 export const addExperience = (payload, token) =>
   apiRequest("/experience", "POST", payload, token);
+
+export const getProject = (token = null) =>
+  apiRequest(`/project`, "GET", null, token);
 
 export const getProjectDetail = (id, token = null) =>
   apiRequest(`/project/${id}`, "GET", null, token);
@@ -78,6 +84,9 @@ export const deleteProjectById = (id, token) =>
 export const addProject = (payload, token) =>
   apiRequest("/project", "POST", payload, token);
 
+export const getSkill = (token = null) =>
+  apiRequest(`/skill`, "GET", null, token);
+
 export const getSkillDetail = (id, token = null) =>
   apiRequest(`/skill/${id}`, "GET", null, token);
 
@@ -89,6 +98,9 @@ export const deleteSkillById = (id, token) =>
 
 export const addSkill = (payload, token) =>
   apiRequest("/skill", "POST", payload, token);
+
+export const getSocial = (token = null) =>
+  apiRequest(`/social`, "GET", null, token);
 
 export const getSocialDetail = (id, token = null) =>
   apiRequest(`/social/${id}`, "GET", null, token);
