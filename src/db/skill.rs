@@ -87,7 +87,7 @@ impl SkillRepository for SkillRepo {
             .insert_one(
                 doc! {
                     "customer_id": oid,
-                    "name": input.name.clone(),
+                    "name": &input.name,
                     "order": input.order,
                     "created_at": created_at,
                 },
@@ -113,7 +113,7 @@ impl SkillRepository for SkillRepo {
                 doc! {"_id":oid },
                 doc! {
                     "$set": {
-                        "name": input.name.clone(),
+                        "name": &input.name,
                         "order": input.order,
                     }
                 },
@@ -158,7 +158,7 @@ impl SkillRepository for SkillRepo {
                     doc! { "_id": oid },
                     doc! {
                         "$set": {
-                            "name": item.name.clone(),
+                            "name": &item.name,
                             "order": item.order,
                         }
                     },

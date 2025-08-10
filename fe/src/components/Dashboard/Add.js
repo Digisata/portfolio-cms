@@ -15,7 +15,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
   const [endDate, setEndDate] = useState("");
   const [isPresent, setIsPresent] = useState(false);
   const [position, setPosition] = useState("");
-  const [description, setDescription] = useState([""]);
+  const [description, setDescription] = useState();
   const [order, setOrder] = useState(1);
 
   const handleDescriptionChange = (index, value) => {
@@ -27,7 +27,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
   };
 
   const addDescriptionField = () => {
-    setDescription((prev) => [...prev, ""]);
+    setDescription((prev) => (prev ? [...prev, ""] : [""]));
   };
 
   const removeDescriptionField = (index) => {
@@ -46,7 +46,6 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
       !location ||
       !startDate ||
       !position ||
-      !description ||
       !order ||
       (!isPresent && !endDate)
     ) {
@@ -67,7 +66,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
       start_date: new Date(startDate).toISOString(),
       is_present: isPresent,
       position,
-      description,
+      description: description && description.length > 0 ? description : null,
       order: Number(order),
     };
 
@@ -157,7 +156,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
         />
 
         <label>Description</label>
-        {description.map((desc, index) => (
+        {description?.map((desc, index) => (
           <div
             key={index}
             style={{
@@ -229,11 +228,11 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
 
 const AddProject = ({ setIsAddingProject, reloadProjects }) => {
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [link, setLink] = useState("");
-  const [photoLink, setPhotoLink] = useState("");
+  const [description, setDescription] = useState();
+  const [link, setLink] = useState();
+  const [photoLink, setPhotoLink] = useState();
   const [order, setOrder] = useState(1);
-  const [stack, setStack] = useState([""]);
+  const [stack, setStack] = useState();
 
   const handleStackChange = (index, value) => {
     setStack((prev) => {
@@ -244,7 +243,7 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
   };
 
   const addStackField = () => {
-    setStack((prev) => [...prev, ""]);
+    setStack((prev) => (prev ? [...prev, ""] : [""]));
   };
 
   const removeStackField = (index) => {
@@ -257,7 +256,7 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
   const handleAdd = async (e) => {
     e.preventDefault();
 
-    if (!name || !description || !link || !photoLink || !order || !stack) {
+    if (!name || !order) {
       return Swal.fire({
         icon: "error",
         title: "Error!",
@@ -274,7 +273,7 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
       link,
       photo_link: photoLink,
       order: Number(order),
-      stack,
+      stack: stack && stack.length > 0 ? stack : null,
     };
 
     try {
@@ -330,7 +329,7 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
         />
 
         <label>Stack</label>
-        {stack.map((desc, index) => (
+        {stack?.map((desc, index) => (
           <div
             key={index}
             style={{

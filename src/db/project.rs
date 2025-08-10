@@ -95,12 +95,12 @@ impl ProjectRepository for ProjectRepo {
             .insert_one(
                 doc! {
                     "customer_id": oid,
-                    "name": input.name.clone(),
-                    "description": input.description.clone(),
-                    "link": input.link.clone(),
-                    "photo_link": input.photo_link.clone(),
+                    "name": &input.name,
+                    "description": &input.description,
+                    "link": &input.link,
+                    "photo_link": &input.photo_link,
                     "order": input.order,
-                    "stack": input.stack.clone(),
+                    "stack": &input.stack,
                     "created_at": created_at,
                 },
                 None,
@@ -125,12 +125,12 @@ impl ProjectRepository for ProjectRepo {
                 doc! {"_id":oid },
                 doc! {
                     "$set": {
-                        "name": input.name.clone(),
-                        "description": input.description.clone(),
-                        "link": input.link.clone(),
-                        "photo_link": input.photo_link.clone(),
+                        "name": &input.name,
+                        "description": &input.description,
+                        "link": &input.link,
+                        "photo_link": &input.photo_link,
                         "order": input.order,
-                        "stack": input.stack.clone(),
+                        "stack": &input.stack,
                     }
                 },
                 find_one_and_update_options,
@@ -178,12 +178,12 @@ impl ProjectRepository for ProjectRepo {
                     doc! { "_id": oid },
                     doc! {
                         "$set": {
-                            "name": item.name.clone(),
-                            "description": item.description.clone(),
-                            "link": item.link.clone(),
-                            "photo_link": item.photo_link.clone(),
+                            "name": &item.name,
+                            "description": &item.description,
+                            "link": &item.link,
+                            "photo_link": &item.photo_link,
                             "order": item.order,
-                            "stack": item.stack.clone(),
+                            "stack": &item.stack,
                         }
                     },
                     find_one_and_update_options,

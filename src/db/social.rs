@@ -89,8 +89,8 @@ impl SocialRepository for SocialRepo {
             .insert_one(
                 doc! {
                     "customer_id": oid,
-                    "name": input.name.clone(),
-                    "link": input.link.clone(),
+                    "name": &input.name,
+                    "link": &input.link,
                     "order": input.order,
                     "created_at": created_at,
                 },
@@ -116,8 +116,8 @@ impl SocialRepository for SocialRepo {
                 doc! {"_id":oid },
                 doc! {
                     "$set": {
-                        "name": input.name.clone(),
-                        "link": input.link.clone(),
+                        "name": &input.name,
+                        "link": &input.link,
                         "order": input.order,
                     }
                 },
@@ -163,8 +163,8 @@ impl SocialRepository for SocialRepo {
                     doc! { "_id": oid },
                     doc! {
                         "$set": {
-                            "name": item.name.clone(),
-                            "link": item.link.clone(),
+                            "name": &item.name,
+                            "link": &item.link,
                             "order": item.order,
                         }
                     },

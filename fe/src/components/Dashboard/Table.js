@@ -114,7 +114,7 @@ const ProjectTable = ({
                   </a>
                 </td>
                 <td>{project.order}</td>
-                <td>{project.stack.join(", ")}</td>
+                <td>{project.stack && project.stack.join(", ")}</td>
                 <td className="text-right">
                   <button
                     onClick={() => handleEditProject(project._id)}

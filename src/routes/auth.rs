@@ -26,13 +26,11 @@ pub async fn login(
     container: &State<crate::Container>,
     input: Json<LoginInput>,
 ) -> Result<Json<LoginResponse>, MyError> {
-    let email = input.email.clone();
-
     let customer_repo = container
         .get::<Arc<dyn CustomerRepository + Send + Sync>>()
         .ok_or_else(|| MyError::build(500, Some("Service not found".to_string())))?;
 
-    match customer_repo.find_customer_by_email(email.clone()).await {
+    match customer_repo.find_customer_by_email(&input.email).await {
         Ok(Some(customer_doc)) => {
             // Verify bcrypt password
             let password_matches = verify(&input.password, &customer_doc.password)
@@ -82,8 +80,6 @@ pub async fn register(
     container: &State<crate::Container>,
     input: Json<LoginInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
-    let email = input.email.clone();
-
     let customer_repo = container
         .get::<Arc<dyn CustomerRepository + Send + Sync>>()
         .ok_or_else(|| {
@@ -92,7 +88,7 @@ pub async fn register(
             }))
         })?;
 
-    match customer_repo.find_customer_by_email(email.clone()).await {
+    match customer_repo.find_customer_by_email(&input.email).await {
         Ok(Some(customer_doc)) => Err(BadRequest(Json(MessageResponse {
             message: format!("Email {} already exist", customer_doc.email),
         }))),
@@ -105,11 +101,11 @@ pub async fn register(
                 api_key,
                 name: "".to_string(),
                 email: input.email.clone(),
-                phone: "".to_string(),
-                wa_link: "".to_string(),
-                intro: "".to_string(),
-                about: "".to_string(),
-                profile_picture: "".to_string(),
+                phone: Option::default(),
+                wa_link: Option::default(),
+                intro: Option::default(),
+                about: Option::default(),
+                profile_picture: Option::default(),
                 password: input.password.clone(),
             };
 

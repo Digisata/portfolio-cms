@@ -176,7 +176,7 @@ pub async fn patch_customer_by_id(
                         }
                     }
                     _ => match customer_repo
-                        .find_customer_by_email(email.to_string())
+                        .find_customer_by_email(email)
                         .await
                     {
                         Ok(email_customer) => match email_customer {

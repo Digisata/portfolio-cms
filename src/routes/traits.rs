@@ -12,11 +12,12 @@ use rocket::serde::json::Json;
 pub trait CustomerRepository {
     // async fn find_customer(&self, limit: i64, page: i64) -> mongodb::error::Result<Vec<Customer>>;
     async fn find_customer_by_id(&self, oid: ObjectId) -> mongodb::error::Result<Option<Customer>>;
-    async fn find_customer_by_api_key(&self, api_key: &str) -> mongodb::error::Result<Option<Customer>>;
-    async fn find_customer_by_email(
+    async fn find_customer_by_api_key(
         &self,
-        email: String,
+        api_key: &str,
     ) -> mongodb::error::Result<Option<Customer>>;
+    async fn find_customer_by_email(&self, email: &str)
+        -> mongodb::error::Result<Option<Customer>>;
     async fn insert_customer(&self, input: Json<CustomerInput>) -> mongodb::error::Result<String>;
     async fn update_customer_by_id(
         &self,
