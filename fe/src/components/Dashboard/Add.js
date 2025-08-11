@@ -13,7 +13,6 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
   const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [isPresent, setIsPresent] = useState(false);
   const [position, setPosition] = useState("");
   const [description, setDescription] = useState();
   const [order, setOrder] = useState(1);
@@ -46,8 +45,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
       !location ||
       !startDate ||
       !position ||
-      !order ||
-      (!isPresent && !endDate)
+      !order
     ) {
       return Swal.fire({
         icon: "error",
@@ -64,7 +62,6 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
       work_type: workType,
       location,
       start_date: new Date(startDate).toISOString(),
-      is_present: isPresent,
       position,
       description: description && description.length > 0 ? description : null,
       order: Number(order),
@@ -72,10 +69,6 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
 
     if (endDate) {
       payload.end_date = new Date(endDate).toISOString();
-    }
-
-    if (isPresent) {
-      payload.end_date = new Date().toISOString();
     }
 
     try {
@@ -146,13 +139,6 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
           type="datetime-local"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
-        />
-
-        <label>Currently Working?</label>
-        <input
-          type="checkbox"
-          checked={isPresent}
-          onChange={(e) => setIsPresent(e.target.checked)}
         />
 
         <label>Description</label>

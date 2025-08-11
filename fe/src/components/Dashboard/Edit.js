@@ -20,7 +20,9 @@ const EditExperience = ({
   const [formData, setFormData] = useState({
     ...selectedExperience,
     start_date: formatToLocalInput(selectedExperience.start_date),
-    end_date: formatToLocalInput(selectedExperience.end_date),
+    end_date:
+      selectedExperience.end_date &&
+      formatToLocalInput(selectedExperience.end_date),
     description: Array.isArray(selectedExperience.description)
       ? selectedExperience.description
       : null,
@@ -68,8 +70,9 @@ const EditExperience = ({
       work_type: formData.work_type,
       location: formData.location,
       start_date: new Date(formData.start_date).toISOString(),
-      end_date: new Date(formData.end_date).toISOString(),
-      is_present: formData.is_present,
+      end_date: formData.end_date
+        ? new Date(formData.end_date).toISOString()
+        : null,
       position: formData.position,
       description: formData.description,
       order: Number(formData.order),
@@ -147,8 +150,9 @@ const EditExperience = ({
       <input
         type="checkbox"
         name="is_present"
-        checked={formData.is_present}
+        checked={!formData.end_date}
         onChange={handleInputChange}
+        disabled
       />
 
       <label>Description</label>

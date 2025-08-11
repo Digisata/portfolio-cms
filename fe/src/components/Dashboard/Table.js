@@ -33,7 +33,7 @@ const ExperienceTable = ({ experiences, handleEdit, handleDelete, error }) => {
                 <td>{exp.position}</td>
                 <td>{exp.start_date}</td>
                 <td>{exp.end_date}</td>
-                <td>{exp.is_present ? "✅" : "❌"}</td>
+                <td>{!exp.end_date ? "✅" : "❌"}</td>
                 <td>{exp.order}</td>
                 <td className="text-right">
                   <button

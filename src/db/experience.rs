@@ -2,7 +2,7 @@ use crate::models::experience::{
     Experience, ExperienceDocument, ExperienceInput, ExperiencesInput,
 };
 use crate::routes::traits::ExperienceRepository;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use futures::stream::TryStreamExt;
 use mongodb::{
     bson::{doc, oid::ObjectId, Document},
@@ -43,25 +43,19 @@ impl ExperienceRepository for ExperienceRepo {
         let mut resp: Vec<Experience> = vec![];
 
         while let Some(result) = cursor.try_next().await? {
-            let mut json_resp = Experience {
+            let json_resp = Experience {
                 id: result.id.to_string(),
                 customer_id: result.customer_id.to_string(),
                 company: result.company,
                 work_type: result.work_type,
                 location: result.location,
                 start_date: result.start_date.to_string(),
-                end_date: result.end_date.to_string(),
-                is_present: result.is_present,
+                end_date: Option::from(result.end_date.map(|d| d.to_string()).unwrap_or_default()),
                 position: result.position,
                 description: result.description,
                 order: result.order,
                 created_at: result.created_at.to_string(),
             };
-
-            if json_resp.is_present {
-                let now: DateTime<Utc> = Utc::now();
-                json_resp.end_date = now.format("%Y-%m-%d %H:%M:%S UTC").to_string();
-            }
 
             resp.push(json_resp);
         }
@@ -77,25 +71,19 @@ impl ExperienceRepository for ExperienceRepo {
         };
 
         // transform ObjectId to String
-        let mut resp = Experience {
+        let resp = Experience {
             id: result.id.to_string(),
             customer_id: result.customer_id.to_string(),
             company: result.company,
             work_type: result.work_type,
             location: result.location,
             start_date: result.start_date.to_string(),
-            end_date: result.end_date.to_string(),
-            is_present: result.is_present,
+            end_date: Option::from(result.end_date.map(|d| d.to_string()).unwrap_or_default()),
             position: result.position,
             description: result.description,
             order: result.order,
             created_at: result.created_at.to_string(),
         };
-
-        if resp.is_present {
-            let now: DateTime<Utc> = Utc::now();
-            resp.end_date = now.format("%Y-%m-%d %H:%M:%S UTC").to_string();
-        }
 
         Ok(Some(resp))
     }
@@ -109,7 +97,10 @@ impl ExperienceRepository for ExperienceRepo {
 
         let created_at = mongodb::bson::DateTime::from_chrono(Utc::now());
         let start_date = mongodb::bson::DateTime::parse_rfc3339_str(&input.start_date).unwrap();
-        let end_date = mongodb::bson::DateTime::parse_rfc3339_str(&input.end_date).unwrap();
+        let end_date = match &input.end_date {
+            Some(s) => Some(mongodb::bson::DateTime::parse_rfc3339_str(s).unwrap()),
+            None => None,
+        };
 
         let resp = collection
             .insert_one(
@@ -120,7 +111,6 @@ impl ExperienceRepository for ExperienceRepo {
                     "location": &input.location,
                     "start_date": start_date,
                     "end_date": end_date,
-                    "is_present": input.is_present,
                     "position": &input.position,
                     "description": &input.description,
                     "order": input.order,
@@ -144,7 +134,10 @@ impl ExperienceRepository for ExperienceRepo {
             .build();
 
         let start_date = mongodb::bson::DateTime::parse_rfc3339_str(&input.start_date).unwrap();
-        let end_date = mongodb::bson::DateTime::parse_rfc3339_str(&input.end_date).unwrap();
+        let end_date = match &input.end_date {
+            Some(s) => Some(mongodb::bson::DateTime::parse_rfc3339_str(s).unwrap()),
+            None => None,
+        };
 
         let Some(result) = collection
             .find_one_and_update(
@@ -156,7 +149,6 @@ impl ExperienceRepository for ExperienceRepo {
                         "location": &input.location,
                         "start_date": start_date,
                         "end_date": end_date,
-                        "is_present": input.is_present,
                         "position": &input.position,
                         "description": &input.description,
                         "order": input.order,
@@ -177,8 +169,7 @@ impl ExperienceRepository for ExperienceRepo {
             work_type: result.work_type,
             location: result.location,
             start_date: result.start_date.to_string(),
-            end_date: result.end_date.to_string(),
-            is_present: result.is_present,
+            end_date: Option::from(result.end_date.map(|d| d.to_string()).unwrap_or_default()),
             position: result.position,
             description: result.description,
             order: result.order,
@@ -206,7 +197,10 @@ impl ExperienceRepository for ExperienceRepo {
                 .build();
 
             let start_date = mongodb::bson::DateTime::parse_rfc3339_str(&item.start_date).unwrap();
-            let end_date = mongodb::bson::DateTime::parse_rfc3339_str(&item.end_date).unwrap();
+            let end_date = match &item.end_date {
+                Some(s) => Some(mongodb::bson::DateTime::parse_rfc3339_str(s).unwrap()),
+                None => None,
+            };
 
             if let Some(result) = collection
                 .find_one_and_update(
@@ -218,7 +212,6 @@ impl ExperienceRepository for ExperienceRepo {
                             "location": &item.location,
                             "start_date": start_date,
                             "end_date": end_date,
-                            "is_present": item.is_present,
                             "position": &item.position,
                             "description": &item.description,
                             "order": item.order,
@@ -235,8 +228,9 @@ impl ExperienceRepository for ExperienceRepo {
                     work_type: result.work_type,
                     location: result.location,
                     start_date: result.start_date.to_string(),
-                    end_date: result.end_date.to_string(),
-                    is_present: result.is_present,
+                    end_date: Option::from(
+                        result.end_date.map(|d| d.to_string()).unwrap_or_default(),
+                    ),
                     position: result.position,
                     description: result.description,
                     order: result.order,
@@ -271,8 +265,7 @@ impl ExperienceRepository for ExperienceRepo {
             work_type: result.work_type,
             location: result.location,
             start_date: result.start_date.to_string(),
-            end_date: result.end_date.to_string(),
-            is_present: result.is_present,
+            end_date: Option::from(result.end_date.map(|d| d.to_string()).unwrap_or_default()),
             position: result.position,
             description: result.description,
             order: result.order,
