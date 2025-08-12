@@ -17,6 +17,8 @@ Cargo.lock
 # github
 .github/
 
+.idea/
+
 # env & config
 .env
 config.toml

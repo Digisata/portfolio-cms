@@ -34,7 +34,7 @@ impl ExperienceRepository for ExperienceRepo {
         let filter = doc! { "customer_id": oid };
 
         let find_options = FindOptions::builder()
-            .sort(doc! { "order": 1 })
+            .sort(doc! { "order": -1 })
             .limit(limit)
             .skip(u64::try_from((page - 1) * limit).unwrap())
             .build();

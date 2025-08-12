@@ -149,7 +149,7 @@ pub async fn get_by_id(
 pub async fn post(
     container: &State<crate::Container>,
     key: ApiKey,
-    input: Json<SocialInput>,
+    mut input: Json<SocialInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
     let social_repo = container
         .get::<Arc<dyn SocialRepository + Send + Sync>>()
@@ -168,10 +168,21 @@ pub async fn post(
     };
 
     // can set with a single error like this.
-    match social_repo.insert(input, oid).await {
-        Ok(resp) => Ok(Json(resp)),
-        Err(_error) => Err(BadRequest(Json(MessageResponse {
-            message: "Invalid input".to_string(),
+    match social_repo.find(1000, 1, oid).await {
+        Ok(resp) => {
+            if resp.len() > 0 {
+                input.order = resp[0].order + 1;
+            }
+
+            match social_repo.insert(input, oid).await {
+                Ok(resp) => Ok(Json(resp)),
+                Err(_error) => Err(BadRequest(Json(MessageResponse {
+                    message: "Invalid input".to_string(),
+                }))),
+            }
+        }
+        Err(error) => Err(BadRequest(Json(MessageResponse {
+            message: error.to_string(),
         }))),
     }
 }

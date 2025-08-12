@@ -15,7 +15,6 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
   const [endDate, setEndDate] = useState("");
   const [position, setPosition] = useState("");
   const [description, setDescription] = useState();
-  const [order, setOrder] = useState(1);
 
   const handleDescriptionChange = (index, value) => {
     setDescription((prev) => {
@@ -39,14 +38,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
   const handleAdd = async (e) => {
     e.preventDefault();
 
-    if (
-      !company ||
-      !workType ||
-      !location ||
-      !startDate ||
-      !position ||
-      !order
-    ) {
+    if (!company || !workType || !location || !startDate || !position) {
       return Swal.fire({
         icon: "error",
         title: "Error!",
@@ -63,8 +55,8 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
       location,
       start_date: new Date(startDate).toISOString(),
       position,
+      order: 0,
       description: description && description.length > 0 ? description : null,
-      order: Number(order),
     };
 
     if (endDate) {
@@ -190,13 +182,6 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
           ➕ Add Description
         </button>
 
-        <label>Order</label>
-        <input
-          type="number"
-          value={order}
-          onChange={(e) => setOrder(e.target.value)}
-        />
-
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Add" />
           <input
@@ -217,7 +202,6 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
   const [description, setDescription] = useState();
   const [link, setLink] = useState();
   const [photoLink, setPhotoLink] = useState();
-  const [order, setOrder] = useState(1);
   const [stack, setStack] = useState();
 
   const handleStackChange = (index, value) => {
@@ -242,7 +226,7 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
   const handleAdd = async (e) => {
     e.preventDefault();
 
-    if (!name || !order) {
+    if (!name) {
       return Swal.fire({
         icon: "error",
         title: "Error!",
@@ -258,7 +242,7 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
       description,
       link,
       photo_link: photoLink,
-      order: Number(order),
+      order: 0,
       stack: stack && stack.length > 0 ? stack : null,
     };
 
@@ -305,13 +289,6 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
         <input
           value={photoLink}
           onChange={(e) => setPhotoLink(e.target.value)}
-        />
-
-        <label>Order</label>
-        <input
-          type="number"
-          value={order}
-          onChange={(e) => setOrder(e.target.value)}
         />
 
         <label>Stack</label>
@@ -380,12 +357,11 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
 
 const AddSkill = ({ setIsAddingSkill, reloadSkills }) => {
   const [name, setName] = useState("");
-  const [order, setOrder] = useState(1);
 
   const handleAdd = async (e) => {
     e.preventDefault();
 
-    if (!name || !order) {
+    if (!name) {
       return Swal.fire({
         icon: "error",
         title: "Error!",
@@ -398,7 +374,7 @@ const AddSkill = ({ setIsAddingSkill, reloadSkills }) => {
 
     const payload = {
       name,
-      order: Number(order),
+      order: 0,
     };
 
     try {
@@ -431,13 +407,6 @@ const AddSkill = ({ setIsAddingSkill, reloadSkills }) => {
         <label>Name</label>
         <input value={name} onChange={(e) => setName(e.target.value)} />
 
-        <label>Order</label>
-        <input
-          type="number"
-          value={order}
-          onChange={(e) => setOrder(e.target.value)}
-        />
-
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Add" />
           <input
@@ -456,12 +425,11 @@ const AddSkill = ({ setIsAddingSkill, reloadSkills }) => {
 const AddSocial = ({ setIsAddingSocial, reloadSocials }) => {
   const [name, setName] = useState("");
   const [link, setLink] = useState("");
-  const [order, setOrder] = useState(1);
 
   const handleAdd = async (e) => {
     e.preventDefault();
 
-    if (!name || !link || !order) {
+    if (!name || !link) {
       return Swal.fire({
         icon: "error",
         title: "Error!",
@@ -475,7 +443,7 @@ const AddSocial = ({ setIsAddingSocial, reloadSocials }) => {
     const payload = {
       name,
       link,
-      order: Number(order),
+      order: 0,
     };
 
     try {
@@ -510,13 +478,6 @@ const AddSocial = ({ setIsAddingSocial, reloadSocials }) => {
 
         <label>Link</label>
         <input value={link} onChange={(e) => setLink(e.target.value)} />
-
-        <label>Order</label>
-        <input
-          type="number"
-          value={order}
-          onChange={(e) => setOrder(e.target.value)}
-        />
 
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Add" />

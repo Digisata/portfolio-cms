@@ -32,7 +32,5 @@ pub async fn connect() -> mongodb::error::Result<Database> {
     let client = Client::with_options(client_options)?;
     let database = client.database(mongo_name.as_str());
 
-    println!("MongoDB Connected!");
-
     Ok(database)
 }

@@ -148,7 +148,7 @@ pub async fn get_by_id(
 pub async fn post(
     container: &State<crate::Container>,
     key: ApiKey,
-    input: Json<ExperienceInput>,
+    mut input: Json<ExperienceInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
     let experience_repo = container
         .get::<Arc<dyn ExperienceRepository + Send + Sync>>()
@@ -166,10 +166,21 @@ pub async fn post(
         })));
     };
 
-    match experience_repo.insert(input, oid).await {
-        Ok(resp) => Ok(Json(resp)),
-        Err(_error) => Err(BadRequest(Json(MessageResponse {
-            message: "Invalid input".to_string(),
+    match experience_repo.find(1000, 1, oid).await {
+        Ok(resp) => {
+            if resp.len() > 0 {
+                input.order = resp[0].order + 1;
+            }
+
+            match experience_repo.insert(input, oid).await {
+                Ok(resp) => Ok(Json(resp)),
+                Err(_error) => Err(BadRequest(Json(MessageResponse {
+                    message: "Invalid input".to_string(),
+                }))),
+            }
+        }
+        Err(error) => Err(BadRequest(Json(MessageResponse {
+            message: error.to_string(),
         }))),
     }
 }

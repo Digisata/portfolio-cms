@@ -149,7 +149,7 @@ pub async fn get_by_id(
 pub async fn post(
     container: &State<crate::Container>,
     key: ApiKey,
-    input: Json<SkillInput>,
+    mut input: Json<SkillInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
     let skill_repo = container
         .get::<Arc<dyn SkillRepository + Send + Sync>>()
@@ -168,10 +168,21 @@ pub async fn post(
     };
 
     // can set with a single error like this.
-    match skill_repo.insert(input, oid).await {
-        Ok(resp) => Ok(Json(resp)),
-        Err(_error) => Err(BadRequest(Json(MessageResponse {
-            message: "Invalid input".to_string(),
+    match skill_repo.find(1000, 1, oid).await {
+        Ok(resp) => {
+            if resp.len() > 0 {
+                input.order = resp[0].order + 1;
+            }
+
+            match skill_repo.insert(input, oid).await {
+                Ok(resp) => Ok(Json(resp)),
+                Err(_error) => Err(BadRequest(Json(MessageResponse {
+                    message: "Invalid input".to_string(),
+                }))),
+            }
+        }
+        Err(error) => Err(BadRequest(Json(MessageResponse {
+            message: error.to_string(),
         }))),
     }
 }
