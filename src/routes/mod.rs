@@ -3,22 +3,13 @@ use rocket_okapi::openapi;
 
 use crate::models::response::MessageResponse;
 
-pub mod customer;
 pub mod auth;
+pub mod customer;
 pub mod experience;
 pub mod project;
 pub mod skill;
 pub mod social;
 pub mod traits;
-
-/// This is a description. <br />You can do simple html <br /> like <b>this<b/>
-#[openapi(tag = "Hello World")]
-#[get("/")]
-pub fn index() -> Json<MessageResponse> {
-    Json(MessageResponse {
-        message: "Hello World!".to_string(),
-    })
-}
 
 #[options("/<_..>")]
 pub fn all_options_handler() -> &'static str {

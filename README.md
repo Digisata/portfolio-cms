@@ -1,14 +1,12 @@
-# rust-rocket-sample
-[![CI](https://github.com/TaeyoonKwon/rust-rocket-sample/actions/workflows/ci.yaml/badge.svg)](https://github.com/TaeyoonKwon/rust-rocket-sample/actions/workflows/ci.yaml)
+# Portfolio CMS
 
-Fully working CRUD REST API example using 
-- Rust (stable)
+- Rust (stable) v1.89.0
 - Rocket.rs
 - mongodb
 - okapi
 
-
 ## 🚀 Features
+
 - Establish MongoDB connection using rocket Adhoc fairing.
 - Custom error handlings with rocket Responder and okapi OpenApiGenerator.
 - CORS fairing and Counter fairing to demonstrate how fairing works.
@@ -18,22 +16,31 @@ Fully working CRUD REST API example using
 - Implement Open API documentation using okapi.
 - Test codes to test API endpoints.
 
-
 ## 🔧 Building and Testing
 
 ### debug mode
+
 > cargo run
 
 ### release mode
+
 > cargo build --release && cargo run --release
 
-
 ### unit testing
+
 > cargo test
 
 <br/>
 
 ℹ️ _You should create your own `.env` file including `MONGO_URI`, `MONGO_DB_NAME`, and `API_KEY` to run it._
 
+## Usage
+
+<BASE_URL>/api-docs
+
+Bearer Auth -> /login
+Api Key -> dashboard
+
 ## 📑 License
-[MIT](https://github.com/TaeyoonKwon/rust-rocket-sample/blob/main/LICENSE) Copyright (c) 2022 Taeyoon Kwon
+
+[MIT](https://github.com/Digisata/portfolio-cms/blob/main/LICENSE) Copyright (c) 2022 Taeyoon Kwon
