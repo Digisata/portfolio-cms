@@ -19,6 +19,7 @@ const EditExperience = ({
 
   const [formData, setFormData] = useState({
     ...selectedExperience,
+    is_present: true,
     start_date: formatToLocalInput(selectedExperience.start_date),
     end_date:
       selectedExperience.end_date &&
@@ -46,7 +47,7 @@ const EditExperience = ({
   const removeDescriptionField = (index) => {
     setFormData((prev) => {
       const updatedDescriptions = prev.description.filter(
-        (_, i) => i !== index,
+        (_, i) => i !== index
       );
       return { ...prev, description: updatedDescriptions };
     });
@@ -138,22 +139,31 @@ const EditExperience = ({
         onChange={handleInputChange}
       />
 
-      <label>End Date</label>
-      <input
-        type="datetime-local"
-        name="end_date"
-        value={formData.end_date}
-        onChange={handleInputChange}
-      />
+      {formData.end_date && (
+        <>
+          <label>End Date</label>
+          <input
+            type="datetime-local"
+            name="end_date"
+            value={formData.end_date}
+            onChange={handleInputChange}
+            disabled
+          />
+        </>
+      )}
 
-      <label>Is Present</label>
-      <input
-        type="checkbox"
-        name="is_present"
-        checked={!formData.end_date}
-        onChange={handleInputChange}
-        disabled
-      />
+      {!formData.end_date && (
+        <>
+          <label>Is Present</label>
+          <input
+            type="checkbox"
+            name="is_present"
+            checked={!formData.end_date}
+            onChange={handleInputChange}
+            disabled
+          />
+        </>
+      )}
 
       <label>Description</label>
       {formData.description &&

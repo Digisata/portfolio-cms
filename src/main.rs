@@ -87,11 +87,10 @@ async fn rocket() -> _ {
         .manage(container)
         .attach(fairings::cors::Cors::new())
         // Serve React frontend from /var/www/html (as copied in Dockerfile)
-        .mount("/", FileServer::from("public"))
+        .mount("/", FileServer::from("build"))
         .mount(
             "/api",
             openapi_get_routes![
-                routes::index,
                 routes::auth::login,
                 routes::auth::register,
                 // routes::customer::get_customers,

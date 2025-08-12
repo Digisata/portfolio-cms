@@ -96,6 +96,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
           type="text"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
+          required
         />
 
         <label>Work Type</label>
@@ -103,6 +104,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
           type="text"
           value={workType}
           onChange={(e) => setWorkType(e.target.value)}
+          required
         />
 
         <label>Location</label>
@@ -110,6 +112,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
+          required
         />
 
         <label>Position</label>
@@ -117,6 +120,7 @@ const AddExperience = ({ setIsAdding, reloadExperiences }) => {
           type="text"
           value={position}
           onChange={(e) => setPosition(e.target.value)}
+          required
         />
 
         <label>Start Date</label>
@@ -274,7 +278,11 @@ const AddProject = ({ setIsAddingProject, reloadProjects }) => {
         <h1>Add Project</h1>
 
         <label>Name</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
 
         <label>Description</label>
         <textarea
@@ -474,7 +482,11 @@ const AddSocial = ({ setIsAddingSocial, reloadSocials }) => {
         <h1>Add Social</h1>
 
         <label>Name</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
 
         <label>Link</label>
         <input value={link} onChange={(e) => setLink(e.target.value)} />
